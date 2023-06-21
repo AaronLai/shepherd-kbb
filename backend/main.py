@@ -2,6 +2,7 @@ from fastapi import FastAPI, Depends
 from backend.config import Settings, get_settings
 
 from backend.src.langchain.router import router as langchain_router
+from backend.src.builder.router import router as builder_router
 
 app = FastAPI()
 
@@ -14,3 +15,4 @@ def health_check(settings: Settings = Depends(get_settings)) -> dict[str, str]:
     }
 
 app.include_router(langchain_router, prefix="/langchain")
+app.include_router(builder_router, prefix="/builder")
