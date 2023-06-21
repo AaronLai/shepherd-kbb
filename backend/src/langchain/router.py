@@ -7,8 +7,6 @@ from backend.config import Settings, get_settings
 
 from langchain.document_loaders import WebBaseLoader, PyPDFLoader
 
-
-
 router = APIRouter()
 
 @router.post('/run')
