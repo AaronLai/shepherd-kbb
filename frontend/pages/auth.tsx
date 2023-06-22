@@ -1,10 +1,12 @@
 import Head from 'next/head'
 import React from 'react'
 import { Button, Card, Container, Flex, Input, Spacer, Tab, TabList, TabPanel, TabPanels, Tabs, Text } from '@chakra-ui/react'
-import { log } from 'console'
-
+import { useAppContext } from "../context/auth"
+import { useRouter } from 'next/router'
 
 export default function Auth() {
+  const {setUser} = useAppContext()
+  const router = useRouter()
   const [loginUser, setLoginUser] = React.useState({
     username: '',
     password: ''
@@ -42,6 +44,14 @@ export default function Auth() {
   React.useEffect(() => {
     console.log(loginUser)
   }, [loginUser])
+  const login = () => {
+    fetch('/api/hello')
+      .then((res) => res.json())
+      .then((data) => {
+        setUser({username: data.username})
+        router.push('/projects')
+      })
+  }
   return (
     <>
       <Head>
@@ -66,7 +76,7 @@ export default function Auth() {
                   <Input placeholder='Enter your password' type="password" value={loginUser.password} onChange={handleLoginInput} id="password" marginY="2" />
                   <Flex>
                     <Spacer />
-                    <Button bgColor="#91FF64" border="2px">Login</Button>
+                    <Button bgColor="#91FF64" border="2px" onClick={()=>login()}>Login</Button>
                   </Flex>
                 </TabPanel>
                 <TabPanel>
