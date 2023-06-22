@@ -3,9 +3,10 @@ from typing import Annotated
 
 from backend.config import Settings, get_settings
 import backend.src.auth.service as AuthService
+from backend.src.auth.dependency import verify_jwt_token
 from backend.src.auth.model import RegisterDTO, LoginDTO
 
-from backend.src.database.Users import userDBService
+from backend.src.database.Users import Users
 
 router = APIRouter()
 
@@ -24,7 +25,7 @@ async def login(body: LoginDTO):
     }
 
 @router.get('/')
-async def get_user_info():
+async def get_user_info(user: Annotated[Users, Depends(verify_jwt_token)]):
     return {
-        'message': 'Hello World'
+        'message': 'Hello {}'.format(user.email)
     }

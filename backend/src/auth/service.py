@@ -1,4 +1,4 @@
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 import bcrypt
 from jose import JWTError, jwt
 
@@ -31,4 +31,25 @@ def create_jwt_token(user_id: str):
     }
 
     return jwt.encode(payload, settings.jwt_secret, algorithm='HS256')
+
+def get_user_from_jwt(token: str):
+    settings = get_settings()
+
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+
+    try:
+        payload = jwt.decode(token, settings.jwt_secret, algorithms=['HS256'])
+        id: str = payload.get("id")
+    except JWTError:
+        raise credentials_exception
+    
+    user = userDBService.get_by_id(id)
+    if user is None:
+        raise credentials_exception
+
+    return (user)
     
