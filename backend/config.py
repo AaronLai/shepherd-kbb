@@ -9,6 +9,8 @@ class Settings(BaseSettings):
     abc = 10
     TESTING_ENVIRONMENT_VAR: str
     OPENAI_API_KEY: str
+    PINECONE_API_KEY :str
+    PINECONE_ENVIRONMENT :str 
 
     class Config:
         env_file = "backend/.env"
