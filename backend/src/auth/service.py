@@ -5,10 +5,10 @@ from jose import JWTError, jwt
 from backend.config import Settings, get_settings
 from backend.src.database.Users import userDBService
 
-def register_user(email, password):
+def register_user(name, email, password):
     salt = bcrypt.gensalt()
     hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt).decode('utf-8')
-    userDBService.create_user(email=email, password=hashed_password)
+    userDBService.create_user(name=name, email=email, password=hashed_password)
     return None
 
 def user_login(email, password):

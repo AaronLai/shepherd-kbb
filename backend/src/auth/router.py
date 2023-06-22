@@ -12,7 +12,7 @@ router = APIRouter()
 
 @router.post('/register')
 async def register(body: RegisterDTO):
-    user = AuthService.register_user(email=body.email, password=body.password)
+    user = AuthService.register_user(name=body.name, email=body.email, password=body.password)
     return {
         'message': 'User registered successfully'
     }

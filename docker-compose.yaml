@@ -6,5 +6,5 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - "./data:/data"
+      - "./backend/data:/data"
     command: ["-jar", "DynamoDBLocal.jar", "-sharedDb", "-dbPath", "/data"]

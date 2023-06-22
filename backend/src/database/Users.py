@@ -6,7 +6,10 @@ import bcrypt
 import uuid
 from datetime import datetime, timezone
 
-table_name = 'Users'
+from backend.config import get_settings
+
+table_name = '852Shepherd_Users'
+settings = get_settings()
 
 def get_current_time_utc():
     return datetime.now(timezone.utc)
@@ -21,15 +24,18 @@ class EmailIndex(GlobalSecondaryIndex):
 class Users(Model):
     class Meta:
         table_name = table_name
-        host = 'http://localhost:8000'
-        region = 'us-east-1'
+        region = settings.aws_region
+        aws_access_key_id = settings.aws_access_key
+        aws_secret_access_key = settings.aws_secret_access_key
         projection = AllProjection()
     
     _id = UnicodeAttribute(hash_key=True)
+    name = UnicodeAttribute()
     email = UnicodeAttribute()
-    email_index = EmailIndex()
     password = UnicodeAttribute()
     create_at = UTCDateTimeAttribute(default_for_new=get_current_time_utc)
+    
+    email_index = EmailIndex()
 
     def is_correct_password(self, expected_password: str) -> bool:
         return bcrypt.checkpw(expected_password.encode('utf-8'), self.password.encode('utf-8'))
@@ -43,11 +49,12 @@ class UserDBService():
     def get_by_id(self, _id: str):
         return Users.get(_id)
 
-    def create_user(self, email, password) -> Users:
+    def create_user(self, name, email, password) -> Users:
         new_id = str(uuid.uuid4()).replace('-', '')
 
         new_user = Users(
             _id=new_id, 
+            name=name,
             email=email, 
             password=password, 
         )
