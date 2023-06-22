@@ -6,6 +6,7 @@ import { useRouter } from 'next/router'
 import { useAppContext } from '@/context/auth'
 import Link from 'next/link'
 import { AddIcon, ArrowForwardIcon, ArrowRightIcon } from '@chakra-ui/icons'
+import CreateProjectModal from '@/components/create-project-modal'
 
 export default function ProjectList() {
     const {user} = useAppContext()
@@ -37,9 +38,7 @@ export default function ProjectList() {
                     <Text>Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequuntur culpa aspernatur tempore quod placeat sequi optio est voluptas enim illo voluptatibus dolor facilis fugit, dicta consequatur id soluta deleniti veritatis.</Text>
                     <Flex>
                         <Spacer />
-                        <Link href="/projects/create">
-                            <Button bgColor="#91FF64" size="lg" marginY="4"><AddIcon w="4" h="4" mr="2" /><Text fontSize="md">New Project</Text></Button>
-                        </Link>
+                        <CreateProjectModal />
                     </Flex>
                     <TableContainer>
                         <Table variant="striped" colorScheme="green">
