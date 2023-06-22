@@ -25,7 +25,7 @@ class BuilderService():
 
 
     def getPinecone(settings: Settings):
-        return PineconeConnector(settings.PINECONE_API_KEY, settings.PINECONE_ENVIRONMENT)
+        return PineconeConnector().getPinecone(settings.PINECONE_API_KEY, settings.PINECONE_ENVIRONMENT)
     
     def embedFile(self, file: UploadFile , pinecone  , embeddings , namespace):
         data = self.fileProcessing(file)
