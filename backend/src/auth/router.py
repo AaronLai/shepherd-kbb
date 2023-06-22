@@ -2,8 +2,10 @@ from fastapi import APIRouter, Depends, File, Form, UploadFile
 from typing import Annotated
 
 from backend.config import Settings, get_settings
-from backend.src.auth.service import AuthService
-from backend.src.auth.model import RegisterDTO
+import backend.src.auth.service as AuthService
+from backend.src.auth.model import RegisterDTO, LoginDTO
+
+from backend.src.database.Users import userDBService
 
 router = APIRouter()
 
@@ -15,5 +17,14 @@ async def register(body: RegisterDTO):
     }
 
 @router.post('/login')
-async def login():
-    return None
+async def login(body: LoginDTO):
+    _, jwt_token = AuthService.user_login(body.email, body.password)
+    return {
+        'jwt': jwt_token
+    }
+
+@router.get('/')
+async def get_user_info():
+    return {
+        'message': 'Hello World'
+    }

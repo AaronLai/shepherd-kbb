@@ -1,4 +1,5 @@
 from pynamodb.models import Model
+from pynamodb.indexes import GlobalSecondaryIndex, AllProjection
 from pynamodb.attributes import UnicodeAttribute, UTCDateTimeAttribute
 
 import bcrypt
@@ -10,14 +11,23 @@ table_name = 'Users'
 def get_current_time_utc():
     return datetime.now(timezone.utc)
 
+class EmailIndex(GlobalSecondaryIndex):
+    class Meta:
+        read_capacity_units = 1
+        write_capacity_units = 1
+        projection = AllProjection()
+    email = UnicodeAttribute(hash_key=True)
+
 class Users(Model):
     class Meta:
         table_name = table_name
         host = 'http://localhost:8000'
         region = 'us-east-1'
+        projection = AllProjection()
     
     _id = UnicodeAttribute(hash_key=True)
     email = UnicodeAttribute()
+    email_index = EmailIndex()
     password = UnicodeAttribute()
     create_at = UTCDateTimeAttribute(default_for_new=get_current_time_utc)
 
@@ -44,5 +54,12 @@ class UserDBService():
         new_user.save()
 
         return new_user
+
+    def search_by_email(self, email: str) -> list[Users]:
+        query_result = Users.email_index.query(email)
+        result = []
+        for i in query_result:
+            result.append(i)
+        return result
 
 userDBService = UserDBService()
