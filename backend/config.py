@@ -14,6 +14,8 @@ class Settings(BaseSettings):
     aws_access_key: str = Field(..., env="AWS_ACCESS_KEY")
     aws_secret_access_key: str = Field(..., env="AWS_SECRET_ACCESS_KEY")
 
+    PINECONE_API_KEY :str
+    PINECONE_ENVIRONMENT :str 
 
     class Config:
         env_file = "backend/.env"
