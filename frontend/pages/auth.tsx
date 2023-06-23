@@ -1,8 +1,9 @@
 import Head from 'next/head'
-import React from 'react'
+import React, { ChangeEvent, FormEvent } from 'react'
 import { Button, Card, Container, Flex, Input, Spacer, Tab, TabList, TabPanel, TabPanels, Tabs, Text } from '@chakra-ui/react'
 import { useAppContext } from "../context/auth"
 import { useRouter } from 'next/router'
+import axios from 'axios';
 
 export default function Auth() {
   const {setUser} = useAppContext()
@@ -17,6 +18,26 @@ export default function Auth() {
     password: '',
     password2: ''
   })
+
+
+  const handleLogin = async () => {
+    try {
+      const response = await axios.post('/api/login', {
+        email: loginUser.email,
+        password: loginUser.password,
+      });
+  
+      const { jwt } = response.data;
+  
+      localStorage.setItem('jwt', jwt);
+  
+      // Redirect to the protected page or perform any other action
+      // ...
+    } catch (error : any ) {
+      console.error(error.response.data);
+    }
+  };
+
   const handleLoginInput = (event: any) => {
     setLoginUser({...loginUser, [event.target.id]: event.target.value })
   }
@@ -45,14 +66,7 @@ export default function Auth() {
   React.useEffect(() => {
     console.log(loginUser)
   }, [loginUser])
-  const login = () => {
-    fetch('/api/hello')
-      .then((res) => res.json())
-      .then((data) => {
-        setUser({username: data.username})
-        router.push('/projects')
-      })
-  }
+
   return (
     <>
       <Head>
@@ -77,7 +91,7 @@ export default function Auth() {
                   <Input placeholder='Enter your password' type="password" value={loginUser.password} onChange={handleLoginInput} id="password" marginY="2" />
                   <Flex>
                     <Spacer />
-                    <Button bgColor="#91FF64" border="2px" onClick={()=>login()}>Login</Button>
+                    <Button bgColor="#91FF64" border="2px" onClick={()=>handleLogin()}>Login</Button>
                   </Flex>
                 </TabPanel>
                 <TabPanel>
