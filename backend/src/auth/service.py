@@ -6,6 +6,12 @@ from backend.config import Settings, get_settings
 from backend.src.database.Users import userDBService
 
 def register_user(name, email, password):
+    if(len(userDBService.search_by_email(email=email)) != 0):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email already exists",
+        )
+
     salt = bcrypt.gensalt()
     hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt).decode('utf-8')
     userDBService.create_user(name=name, email=email, password=hashed_password)
