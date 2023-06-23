@@ -24,7 +24,7 @@ async def login(body: LoginDTO):
         'jwt': jwt_token
     }
 
-@router.get('/')
+@router.get('')
 async def get_user_info(user: Annotated[Users, Depends(verify_jwt_token)]):
     return {
         'message': 'Hello {}'.format(user.email)
