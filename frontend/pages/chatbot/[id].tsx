@@ -1,6 +1,6 @@
 import Head from 'next/head'
 import React from 'react'
-import { Button, Card, Container, Flex, Input, InputGroup, InputRightElement, Spacer, Tab, TabList, TabPanel, TabPanels, Table, TableContainer, Tabs, Tbody, Td, Text, Textarea, Th, Thead, Tr, position } from '@chakra-ui/react'
+import { Box, Button, Card, Container, Flex, Input, InputGroup, InputRightElement, Spacer, Tab, TabList, TabPanel, TabPanels, Table, TableContainer, Tabs, Tbody, Td, Text, Textarea, Th, Thead, Tr, position } from '@chakra-ui/react'
 import moment from 'moment'
 import { useRouter } from 'next/router'
 import { useAppContext } from '@/context/auth'
@@ -12,17 +12,28 @@ import {
   MessageList,
   Message,
   MessageInput,
+  TypingIndicator,
 } from "@chatscope/chat-ui-kit-react";
+
+type MessageType = {
+    message: string,
+    sentTime: string,
+    sender: string,
+    direction: any,
+    position: any
+}
 
 export default function CreateProject() {
     const {user} = useAppContext()
     const router = useRouter()
+    const [rolePrompt, setRolePrompt] = React.useState("")
     const [userQuestion, setUserQuestion] = React.useState("")
-    const [messages, setMessages] = React.useState([{
+    const [loading, setLoading] = React.useState(false)
+    const [messages, setMessages] = React.useState<MessageType[]>([{
         message: "Hello! Please ask me some questions!",
         sentTime: "just now",
         sender: "Chatbot",
-        direction: 'incoming',
+        direction: "incoming",
         position: "last"
     }])
     const askQuestion = () => {
@@ -31,14 +42,37 @@ export default function CreateProject() {
             message: userQuestion,
             sentTime: "just now",
             sender: "Me",
-            direction: 'outgoing',
+            direction: "outgoing",
             position: "last"
         }])
         setUserQuestion("")
+        setLoading(true)
+        setTimeout(() => {
+            setMessages([...messages, {
+                message: userQuestion,
+                sentTime: "just now",
+                sender: "Me",
+                direction: "outgoing",
+                position: "last"
+            },{
+                message: "response",
+                sentTime: "just now",
+                sender: "Chatbot",
+                direction: "incoming",
+                position: "last"
+            }])
+            setLoading(false)
+        }, 3000)
     }
     React.useEffect(() => {
         console.log(messages);
     }, [messages])
+    React.useEffect(() => {
+        console.log(user)
+        if(user == null){
+            router.push('/auth')
+        }
+    }, [])
     return (
         <>
         <Head>
@@ -51,6 +85,9 @@ export default function CreateProject() {
             user != null? (
                 <main>
                     <Container marginY="20">
+                    <Text fontSize="xl">Your Role Prompt</Text>
+                    <Textarea placeholder="Role Prompt" marginTop="2" marginBottom="4" value={rolePrompt} onChange={(e)=>setRolePrompt(e.target.value)} />
+                    <Text fontSize="xl">Chatbox</Text>
                     <div style={{ position: "relative", height: "500px" }}>
                         <MainContainer>
                             <ChatContainer>
@@ -64,6 +101,9 @@ export default function CreateProject() {
                                         )
                                     })
                                 }
+                                <Flex display={loading? "block" : "none"}>
+                                    <TypingIndicator />
+                                </Flex>
                             </MessageList>
                             <MessageInput placeholder="Type message here" value={userQuestion} onChange={(e: any)=>setUserQuestion(e)} attachButton={false} onSend={()=>askQuestion()} sendButton={true} autoFocus />
                             </ChatContainer>

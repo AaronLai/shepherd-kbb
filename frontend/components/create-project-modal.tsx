@@ -5,6 +5,7 @@ import React from "react"
 export default function CreateProjectModal() {
     const { isOpen, onOpen, onClose } = useDisclosure()
     const [projectName, setProjectName] = React.useState('')
+    const [role, setRole] = React.useState('')
     const createProject = () => {
         console.log(projectName)
         onClose()
@@ -27,6 +28,10 @@ export default function CreateProjectModal() {
                 What is the name of your new project?
               </Text>
               <Input placeholder='Project Name' value={projectName} onChange={(e)=>setProjectName(e.target.value)} />
+              <Text mb='1rem' marginTop="4">
+                What is your role?
+              </Text>
+              <Input placeholder='Role' value={role} onChange={(e)=>setRole(e.target.value)} />
             </ModalBody>
             <ModalFooter>
               <Button variant="ghost" mr={3} onClick={onClose}>

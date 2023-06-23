@@ -2,6 +2,7 @@ import Head from 'next/head'
 import Image from 'next/image'
 import styles from '@/styles/Home.module.css'
 import { Button, Center, Container, Text } from '@chakra-ui/react'
+import Link from 'next/link'
 
 
 export default function Home() {
@@ -13,7 +14,7 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Container>
+      <Container marginY="20">
         <Text fontSize='4xl' marginBottom="4" textAlign='center' fontWeight='bold'>Welcome to 852Shepherd!</Text>
         <Text size="md" marginY="2">
         "KnowledgeBot Builder" - Empowering You to Create Intelligent AI-Assistants without Code!
@@ -31,7 +32,9 @@ export default function Home() {
           At KnowledgeBot Builder, we understand the user's needs for a seamless experience. Simply upload your documents or provide URLs, and leave the rest to us. We will handle software engineering and prompt engineering.
         </Text>
         <Center marginTop="20">
-          <Button bg='#55EF16' alignItems='center'>Check out our public chatbots!</Button>
+          <Link href="/auth">
+            <Button bg='#55EF16' alignItems='center'>Try it out!</Button>
+          </Link>
         </Center>
       
       </Container>

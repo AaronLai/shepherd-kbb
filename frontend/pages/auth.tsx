@@ -8,10 +8,11 @@ export default function Auth() {
   const {setUser} = useAppContext()
   const router = useRouter()
   const [loginUser, setLoginUser] = React.useState({
-    username: '',
+    email: '',
     password: ''
   })
   const [signupUser, setSignupUser] = React.useState({
+    email: '',
     username: '',
     password: '',
     password2: ''
@@ -36,7 +37,7 @@ export default function Auth() {
     return false;
   }
   const isValid = () => {
-    return signupUser.username.length > 5 && signupUser.password.length > 5 && signupUser.password === signupUser.password2 && containsNumbersAndSymbols(signupUser.password)
+    return signupUser.email.length > 5 && signupUser.username.length > 5 && signupUser.password.length > 5 && signupUser.password === signupUser.password2 && containsNumbersAndSymbols(signupUser.password)
   }
   React.useEffect(() => {
     console.log(signupUser)
@@ -66,13 +67,13 @@ export default function Auth() {
           <Card bgColor="gray.100" marginY="10" padding="4">
             <Tabs colorScheme="red">
               <TabList>
-                <Tab onClick={()=>setSignupUser({ username: '', password: '', password2: ''})}>Login</Tab>
-                <Tab onClick={()=>setLoginUser({ username: '', password: ''})}>Signup</Tab>
+                <Tab onClick={()=>setSignupUser({ email: '', username: '', password: '', password2: ''})}>Login</Tab>
+                <Tab onClick={()=>setLoginUser({ email: '', password: ''})}>Signup</Tab>
               </TabList>
 
               <TabPanels>
                 <TabPanel>
-                  <Input placeholder='Enter your username' value={loginUser.username} onChange={handleLoginInput} id="username" marginY="2" />
+                  <Input placeholder='Enter your email' value={loginUser.email} onChange={handleLoginInput} id="email" marginY="2" />
                   <Input placeholder='Enter your password' type="password" value={loginUser.password} onChange={handleLoginInput} id="password" marginY="2" />
                   <Flex>
                     <Spacer />
@@ -80,6 +81,7 @@ export default function Auth() {
                   </Flex>
                 </TabPanel>
                 <TabPanel>
+                <Input placeholder='Enter your email' value={signupUser.email} onChange={handleSignupInput} id="email" marginY="2" />
                 <Input placeholder='Enter your username' value={signupUser.username} onChange={handleSignupInput} id="username" marginY="2" />
                 <Input placeholder='Enter your password' type="password" value={signupUser.password} onChange={handleSignupInput} id="password" marginY="2" />
                 <Input placeholder='Re-enter your password' type="password" value={signupUser.password2} onChange={handleSignupInput} id="password2" marginY="2" />
