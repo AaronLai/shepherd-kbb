@@ -1,15 +1,21 @@
 import { AddIcon } from "@chakra-ui/icons"
 import { useDisclosure, Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, Text, Input } from "@chakra-ui/react"
 import React from "react"
+import axios from "axios"
 
 export default function CreateProjectModal() {
     const { isOpen, onOpen, onClose } = useDisclosure()
     const [projectName, setProjectName] = React.useState('')
     const [role, setRole] = React.useState('')
-    const createProject = () => {
-        console.log(projectName)
-        onClose()
-        setProjectName("")
+    const createProject = async () => {
+      await axios.post('/api/project', {
+          name: projectName,
+          role: role
+      }).then((res) => {
+          console.log(res.data)
+      })
+      onClose()
+      setProjectName("")
     }
     const nameIsValid = () => {
         return projectName.length > 5 && projectName.length < 46

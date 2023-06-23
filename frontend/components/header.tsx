@@ -5,10 +5,10 @@ import { useAppContext } from "../context/auth"
 import { useRouter } from 'next/router'
 
 export default function Header(){
-    const { user, setUser } = useAppContext()
+    const { jwt, setJwtToken } = useAppContext()
     const router = useRouter()
     const logout = () => {
-        setUser(null)
+        setJwtToken("")
         router.push('/auth')
     }
     return(
@@ -33,7 +33,7 @@ export default function Header(){
                     {/* <MenuItem _hover={{bgColor: "gray.200"}} borderBottom="1px" borderColor="gray.200" paddingY="3">Your Profile</MenuItem> */}
                     <MenuItem _hover={{bgColor: "gray.200"}} paddingY="3">
                         {
-                            user == null? (
+                            jwt == null? (
                                 <Link href='/auth'>
                                     Sign Up/Login
                                 </Link>

@@ -5,15 +5,33 @@ import moment from 'moment'
 import { useRouter } from 'next/router'
 import { useAppContext } from '@/context/auth'
 import Link from 'next/link'
-import { AddIcon, ArrowForwardIcon, ArrowRightIcon } from '@chakra-ui/icons'
+import { AddIcon, ArrowForwardIcon, ArrowRightIcon, ChatIcon } from '@chakra-ui/icons'
 import CreateProjectModal from '@/components/create-project-modal'
+import axios from 'axios'
 
 export default function ProjectList() {
-    const {user} = useAppContext()
+    const {jwt, setJwtToken} = useAppContext()
     const router = useRouter()
     React.useEffect(() => {
-        console.log(user)
-        if(user == null){
+        if(typeof window !== "undefined" && localStorage.getItem("jwt") !== undefined){
+            const getProjects = async () => {
+                try {
+                    await axios.get('/api/project', {
+                        headers: {
+                            'token': localStorage.getItem("jwt")
+                        }
+                    }).then((res) => {
+                        console.log(res.data)
+                    })
+                    setJwtToken(jwt)
+                    router.push('/projects');
+                } catch (error : any ) {
+                    console.error(error.response.data);
+                }
+            }
+            getProjects();
+        }
+        else{
             router.push('/auth')
         }
     }, [])
@@ -22,6 +40,15 @@ export default function ProjectList() {
         {name: "Project2", lastUpdated: Date.now(), id: '456'},
         {name: "Project3", lastUpdated: Date.now(), id: '789'},
     ]
+    //protected page
+    const getLocalStorageItem = (key: string) => {
+        if (typeof window !== undefined){
+        return window.localStorage.getItem(key)
+        }
+    };
+    React.useEffect(() => {
+        setJwtToken(getLocalStorageItem("jwt"));
+    }, []);
     return (
         <>
         <Head>
@@ -31,7 +58,7 @@ export default function ProjectList() {
             <link rel="icon" href="/favicon.ico" />
         </Head>
         {
-            user != null? (
+            jwt === null? <></>:(
                 <main>
                     <Container marginY="20">
                     <Text fontSize="2xl" textAlign='center' fontWeight='bold' marginBottom="12">New Projects</Text>
@@ -46,7 +73,8 @@ export default function ProjectList() {
                                 <Tr>
                                     <Th>Name</Th>
                                     <Th>Last Updated</Th>
-                                    <Th>Visit Project</Th>
+                                    <Th>Update</Th>
+                                    <Th>Chat</Th>
                                 </Tr>
                             </Thead>
                             <Tbody>
@@ -57,6 +85,7 @@ export default function ProjectList() {
                                             <Td>{item.name}</Td>
                                             <Td>{moment(item.lastUpdated).format('lll')}</Td>
                                             <Td textAlign="center"><Link href={`/projects/${item.id}`}><Button variant="link"><ArrowForwardIcon w="6" h="6" /></Button></Link></Td>
+                                            <Td textAlign="center"><Link href={`/chatbot/${item.id}`}><Button variant="link"><ChatIcon w="6" h="6" /></Button></Link></Td>
                                         </Tr>
                                         )
                                     })
@@ -66,7 +95,7 @@ export default function ProjectList() {
                     </TableContainer>
                     </Container>
                 </main>
-            ):<></>
+            )
         }
     </>
     )

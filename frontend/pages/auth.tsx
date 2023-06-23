@@ -6,7 +6,7 @@ import { useRouter } from 'next/router'
 import axios from 'axios';
 
 export default function Auth() {
-  const {setUser} = useAppContext()
+  const {setJwtToken} = useAppContext()
   const router = useRouter()
   const [loginUser, setLoginUser] = React.useState({
     email: '',
@@ -30,9 +30,26 @@ export default function Auth() {
       const { jwt } = response.data;
   
       localStorage.setItem('jwt', jwt);
+      setJwtToken(jwt)
+      router.push('/projects');
+    } catch (error : any ) {
+      console.error(error.response.data);
+    }
+  };
+
+  const handleSignup = async () => {
+    try {
+      const response = await axios.post('/api/signup', {
+        email: signupUser.email,
+        name: signupUser.username,
+        password: signupUser.password,
+      });
   
-      // Redirect to the protected page or perform any other action
-      // ...
+      const { jwt } = response.data;
+  
+      localStorage.setItem('jwt', jwt);
+      setJwtToken(jwt)
+      router.push('/projects');
     } catch (error : any ) {
       console.error(error.response.data);
     }
@@ -101,7 +118,7 @@ export default function Auth() {
                 <Input placeholder='Re-enter your password' type="password" value={signupUser.password2} onChange={handleSignupInput} id="password2" marginY="2" />
                 <Flex>
                   <Spacer />
-                  <Button isDisabled={!isValid()} bgColor="#91FF64" border="2px">Sign Up</Button>
+                  <Button isDisabled={!isValid()} bgColor="#91FF64" border="2px" onClick={()=>handleSignup()}>Sign Up</Button>
                 </Flex>
                 </TabPanel>
               </TabPanels>

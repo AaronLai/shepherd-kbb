@@ -14,6 +14,7 @@ import {
   MessageInput,
   TypingIndicator,
 } from "@chatscope/chat-ui-kit-react";
+import axios from 'axios'
 
 type MessageType = {
     message: string,
@@ -24,7 +25,7 @@ type MessageType = {
 }
 
 export default function CreateProject() {
-    const {user} = useAppContext()
+    const {jwt, setJwtToken} = useAppContext()
     const router = useRouter()
     const [rolePrompt, setRolePrompt] = React.useState("")
     const [userQuestion, setUserQuestion] = React.useState("")
@@ -36,7 +37,7 @@ export default function CreateProject() {
         direction: "incoming",
         position: "last"
     }])
-    const askQuestion = () => {
+    const askQuestion = async () => {
         console.log(userQuestion);
         setMessages([...messages, {
             message: userQuestion,
@@ -47,7 +48,14 @@ export default function CreateProject() {
         }])
         setUserQuestion("")
         setLoading(true)
-        setTimeout(() => {
+        try {
+            const response = await axios.post('/api/chatting', {
+                projectId: "test",
+                userId: "test",
+                nameSpace: "new",
+                text: userQuestion
+            });
+            const { answer } = response.data;
             setMessages([...messages, {
                 message: userQuestion,
                 sentTime: "just now",
@@ -55,24 +63,29 @@ export default function CreateProject() {
                 direction: "outgoing",
                 position: "last"
             },{
-                message: "response",
+                message: answer,
                 sentTime: "just now",
                 sender: "Chatbot",
                 direction: "incoming",
                 position: "last"
             }])
             setLoading(false)
-        }, 3000)
+        } catch (error : any ) {
+            console.error(error.response.data);
+        }
     }
     React.useEffect(() => {
         console.log(messages);
     }, [messages])
-    React.useEffect(() => {
-        console.log(user)
-        if(user == null){
-            router.push('/auth')
+    //protected page
+    const getLocalStorageItem = (key: string) => {
+        if (typeof window !== undefined){
+        return window.localStorage.getItem(key)
         }
-    }, [])
+    };
+    React.useEffect(() => {
+        setJwtToken(getLocalStorageItem("jwt"));
+    }, []);
     return (
         <>
         <Head>
@@ -82,7 +95,7 @@ export default function CreateProject() {
             <link rel="icon" href="/favicon.ico" />
         </Head>
         {
-            user != null? (
+            jwt !== null? (
                 <main>
                     <Container marginY="20">
                     <Text fontSize="xl">Your Role Prompt</Text>

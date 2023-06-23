@@ -1,17 +1,18 @@
+import React from "react";
 import { ReactNode, createContext, useContext, useState } from "react";
 
 type contextType = {
-    user: Object | null,
-    setUser: (user: any) => void,
+    jwt: string,
     theme: string,
     setTheme: (theme: string) => void
     projects: Array<Object>
-    setProjects: (projects: Array<Object>) => void
+    setProjects: (projects: Array<Object>) => void,
+    setJwtToken: any
 }
 
 const contextDefault: contextType = {
-    user: null,
-    setUser: () => {},
+    jwt: "",
+    setJwtToken: () => {},
     theme: "light",
     setTheme: () => {},
     projects: [],
@@ -29,14 +30,21 @@ type Props = {
 };
 
 export function ContextProvider({ children }: Props) {
-    const [user, setUser] = useState<boolean | null>(null);
+    const [jwt, setJwt] = useState<string>("");
     const [theme, setTheme] = useState<string>("light");
     const [projects, setProjects] = useState<Array<Object>>([]);
+    const setJwtToken = (jwt: string) => {
+        setJwt(jwt)
+    }
     const value = {
-        user, setUser,
+        jwt, setJwtToken,
         theme, setTheme,
         projects, setProjects
     }
+    React.useEffect(() => {
+        console.log("JWT: ", jwt)
+    }, [jwt])
+    
     return (
         <>
             <context.Provider value={value}>

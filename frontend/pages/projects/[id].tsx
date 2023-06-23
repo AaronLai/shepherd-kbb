@@ -6,35 +6,51 @@ import { useRouter } from 'next/router'
 import { useAppContext } from '@/context/auth'
 import Link from 'next/link'
 import { AddIcon, ArrowForwardIcon, ArrowRightIcon, CloseIcon } from '@chakra-ui/icons'
+import { pass_youtube, upload_file } from '@/query/builder'
+import axios from 'axios'
 
 export default function Chatbot() {
-    const {user} = useAppContext()
+    const {jwt, setJwtToken} = useAppContext()
     const router = useRouter()
-    const [files, setFiles] = React.useState([])
-    const [youtubeLinks, setYoutubeLinks] = React.useState<string[]>([])
+    const [files, setFiles] = React.useState<File | null>(null)
+    const [youtubeLinks, setYoutubeLinks] = React.useState<string>("")
     const [youtubeLinkInput, setYoutubeLinkInput] = React.useState('')
-    const [webLinks, setWebLinks] = React.useState<string[]>([])
+    const [webLinks, setWebLinks] = React.useState<string>("")
     const [webLinkInput, setWebLinkInput] = React.useState('')
     const [testPrompt, setTestPrompt] = React.useState("")
     const [loading, setLoading] = React.useState(false)
     const [response, setResponse] = React.useState("")
-    React.useEffect(() => {
-        console.log(user)
-        if(user == null){
-            router.push('/auth')
-        }
-    }, [])
     const saveProject = () => {
         console.log("saving...")
     }
-    const addYoutubeLink = () => {
-        setYoutubeLinks([...youtubeLinks, youtubeLinkInput])
-        console.log([...youtubeLinks, youtubeLinkInput])
+    const addYoutubeLink = async () => {
+        try{
+            setLoading(true)
+            const response = await axios.post('/api/youtube_pass', {
+                url: youtubeLinkInput
+            })
+            setYoutubeLinks(response.data.url)
+            setYoutubeLinkInput("")
+            setLoading(false)
+        }
+        catch(err){
+            console.log(err)
+        }
         setYoutubeLinkInput("")
     }
-    const addWebLinks = () => {
-        setWebLinks([...webLinks, webLinkInput])
-        console.log([...webLinks, webLinkInput])
+    const addWebLinks = async () => {
+        try{
+            setLoading(true)
+            const response = await axios.post('/api/webpage_read', {
+                url: webLinkInput
+            })
+            setYoutubeLinks(response.data.url)
+            setYoutubeLinkInput("")
+            setLoading(false)
+        }
+        catch(err){
+            console.log(err)
+        }
         setWebLinkInput("")
     }
     const selectFile = () => {
@@ -42,7 +58,22 @@ export default function Chatbot() {
         file_selector?.click()
     }
     const useFile = (fileList: any) => {
-        fileList!=null?setFiles(files.concat(...fileList)):null
+        fileList!=null?setFiles(fileList[0]):null
+    }
+    const uploadFile = async (file: any) => {
+        try {
+            let bodyFormData = new FormData();
+            bodyFormData.append("file", file);
+            const response = await axios.post("/api/file_upload", {file: file}, {
+                headers: {
+                    "Content-Type": "multipart/form-data"
+                }
+            })
+            console.log(response.data)
+                    
+        } catch (error) {
+            console.log(error)
+        }
     }
     React.useEffect(() => {
         console.log(files)
@@ -54,6 +85,15 @@ export default function Chatbot() {
             setLoading(false)
         }, 3000)
     }
+    //protected page
+    const getLocalStorageItem = (key: string) => {
+        if (typeof window !== undefined){
+        return window.localStorage.getItem(key)
+        }
+    };
+    React.useEffect(() => {
+        setJwtToken(getLocalStorageItem("jwt"));
+    }, []);
     return (
         <>
         <Head>
@@ -63,7 +103,7 @@ export default function Chatbot() {
             <link rel="icon" href="/favicon.ico" />
         </Head>
         {
-            user != null? (
+            jwt !== null? (
                 <main>
                     <Container marginY="20">
                     <Text fontSize="2xl" textAlign='center' fontWeight='bold' marginBottom="8">project_name</Text>
@@ -85,23 +125,25 @@ export default function Chatbot() {
                             }}
                             accept=".doc, .docx, .pdf"
                             display="none"
-                            multiple
                             onChange={(e) => useFile(e.target.files)}
                             border="0"
                             id="file-selector"
                         />
                         {
-                            files.map((file: File, index) => {
-                                return(
-                                    <Flex gap="1" marginLeft="2">
-                                        <Text fontSize="md" key={index} letterSpacing="0">{file.name}</Text>
-                                        <Spacer />
-                                        <Button variant="link" onClick={()=>setFiles(files.filter((value: File)=>value.name!=file.name))}>
-                                            <CloseIcon color="red.500" />
-                                        </Button>
-                                    </Flex>
-                                )
-                            })
+                            files != null
+                            ?(
+                                <Flex gap="1" marginLeft="2">
+                                    <Text fontSize="md" letterSpacing="0">{files.name}</Text>
+                                    <Spacer />
+                                    <Button variant="link" onClick={()=>setFiles(null)}>
+                                        <CloseIcon color="red.500" />
+                                    </Button>
+                                    <Button variant="link" onClick={()=>uploadFile(files)}>
+                                        <AddIcon color="green.500" />
+                                    </Button>
+                                </Flex>
+                            )
+                            :null
                         }
                         <Text fontSize="md" marginTop="2">Please enter web URLs here:</Text>
                         <InputGroup>
@@ -110,19 +152,6 @@ export default function Chatbot() {
                                 <Button onClick={()=>addWebLinks()} variant="link" isDisabled={webLinkInput.length==0}><AddIcon color='green.500' /></Button>
                             </InputRightElement>
                         </InputGroup>
-                        {
-                            webLinks.map((link, index) => {
-                                return(
-                                    <Flex gap="1" marginLeft="2">
-                                        <Text fontSize="md" key={link} letterSpacing="0">{link}</Text>
-                                        <Spacer />
-                                        <Button variant="link" onClick={()=>setWebLinks(webLinks.filter((value)=>value!=link))}>
-                                            <CloseIcon color="red.500" />
-                                        </Button>
-                                    </Flex>
-                                )
-                            })
-                        }
                         <Text fontSize="md" marginTop="2">Please enter YouTube Links here:</Text>
                         <InputGroup>
                             <Input placeholder='Youtube Link:' value={youtubeLinkInput} onChange={(e)=>setYoutubeLinkInput(e.target.value)} />
@@ -130,19 +159,6 @@ export default function Chatbot() {
                                 <Button onClick={()=>addYoutubeLink()} variant="link" isDisabled={youtubeLinkInput.length==0}><AddIcon color='green.500' /></Button>
                             </InputRightElement>
                         </InputGroup>
-                        {
-                            youtubeLinks.map((link, index) => {
-                                return(
-                                    <Flex gap="1" marginLeft="2">
-                                        <Text fontSize="md" key={link}>{link}</Text>
-                                        <Spacer />
-                                        <Button variant="link" onClick={()=>setYoutubeLinks(youtubeLinks.filter((value)=>value!=link))}>
-                                            <CloseIcon color="red.500" />
-                                        </Button>
-                                    </Flex>
-                                )
-                            })
-                        }
                         <Flex marginTop="4">
                             <Button onClick={()=>router.back()} bgColor="gray.200">Back</Button>   
                             <Spacer />
