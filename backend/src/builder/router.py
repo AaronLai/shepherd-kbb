@@ -1,5 +1,5 @@
 from typing import Annotated
-from fastapi import APIRouter, Depends, File, Form, UploadFile
+from fastapi import APIRouter, Depends, File, Form, UploadFile, HTTPException
 
 from backend.src.builder.service import BuilderService
 from backend.src.builder.model import PassYoutubeDTO , WebpageDTO
@@ -9,9 +9,9 @@ from langchain.document_loaders import WebBaseLoader, PyPDFLoader
 from backend.src.utilities.pinecone import PineconeConnector
 from backend.src.utilities.openai import OpenAi
 from langchain.embeddings.openai import OpenAIEmbeddings
-import os
 import pinecone
-
+from backend.src.auth.dependency import verify_jwt_token
+from backend.src.database.Users import Users
 
 
 router = APIRouter()
@@ -23,40 +23,29 @@ pinecone.init(
                 environment=settings.PINECONE_ENVIRONMENT 
             )
 
-@router.get('/')
-async def greeting(settings: Settings = Depends(get_settings)):
-
-    return {'hi': settings.OPENAI_API_KEY}
-
-
-
 @router.post('/uploadFile')
 async def upload(file: UploadFile = File(...), settings: Settings = Depends(get_settings)):
-    
-    builderService = BuilderService(settings)
-    vector  = builderService.embedFile( file, pinecone , embeddings ,"new")
+    try:
+        builderService = BuilderService(settings)
+        vector = builderService.embedFile(file, pinecone, embeddings, "new")
+        return {'status': 'success', 'message': 'File uploaded successfully!'}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
-    return {
-        'type':file.filename,
-    }
-    
 @router.post('/passYoutube')
-async def passYoutube(data:PassYoutubeDTO, settings: Settings = Depends(get_settings)):
-    
-    builderService = BuilderService(settings)
-    vector  = builderService.embedYoutube( data.url, pinecone , embeddings ,"new")
-
-    return {
-        'type':data.url,
-    }
-    
+async def passYoutube(data: PassYoutubeDTO, user: Annotated[Users, Depends(verify_jwt_token)], settings: Settings = Depends(get_settings)):
+    try:
+        builderService = BuilderService(settings)
+        vector = builderService.embedYoutube(data.url, pinecone, embeddings, data.projectId)
+        return {'status': 'success', 'message': 'YouTube URL processed successfully!'}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.post('/readWebpage')
-async def readWebpage(data:WebpageDTO, settings: Settings = Depends(get_settings)):
-    
-    builderService = BuilderService(settings)
-    vector  = builderService.embedWeb( data.url, pinecone , embeddings ,"new")
-
-    return {
-        'type':data.url,
-    }
+async def readWebpage(data: WebpageDTO, user: Annotated[Users, Depends(verify_jwt_token)], settings: Settings = Depends(get_settings)):
+    try:
+        builderService = BuilderService(settings)
+        vector = builderService.embedWeb(data.url, pinecone, embeddings, data.projectId)
+        return {'status': 'success', 'message': 'Webpage read successfully!'}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
