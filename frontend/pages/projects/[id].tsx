@@ -119,9 +119,7 @@ export default function Chatbot() {
         setLoading(true)
         try {
             const response = await axios.post('/api/chatting', {
-                projectId: "test",
-                userId: "test",
-                nameSpace: "new",
+                projectId: projectId,
                 text: userQuestion
             });
             const { answer } = response.data;
