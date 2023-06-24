@@ -1,10 +1,7 @@
 import Head from 'next/head'
 import React from 'react'
-import { Box, Button, Card, Container, Flex, Input, InputGroup, InputRightElement, Spacer, Tab, TabList, TabPanel, TabPanels, Table, TableContainer, Tabs, Tbody, Td, Text, Textarea, Th, Thead, Tr, position } from '@chakra-ui/react'
-import moment from 'moment'
-import { useRouter } from 'next/router'
+import { Container, Flex, Text, Textarea, useToast } from '@chakra-ui/react'
 import { useAppContext } from '@/context/auth'
-import Link from 'next/link'
 import "@chatscope/chat-ui-kit-styles/dist/default/styles.min.css";
 import {
   MainContainer,
@@ -14,6 +11,8 @@ import {
   MessageInput,
   TypingIndicator,
 } from "@chatscope/chat-ui-kit-react";
+import axios from 'axios'
+import { useRouter } from 'next/router';
 
 type MessageType = {
     message: string,
@@ -24,7 +23,8 @@ type MessageType = {
 }
 
 export default function CreateProject() {
-    const {user} = useAppContext()
+    const {jwt, setJwtToken} = useAppContext()
+    const toast = useToast()
     const router = useRouter()
     const [rolePrompt, setRolePrompt] = React.useState("")
     const [userQuestion, setUserQuestion] = React.useState("")
@@ -36,7 +36,7 @@ export default function CreateProject() {
         direction: "incoming",
         position: "last"
     }])
-    const askQuestion = () => {
+    const askQuestion = async () => {
         console.log(userQuestion);
         setMessages([...messages, {
             message: userQuestion,
@@ -47,7 +47,14 @@ export default function CreateProject() {
         }])
         setUserQuestion("")
         setLoading(true)
-        setTimeout(() => {
+        try {
+            const response = await axios.post('/api/chatting', {
+                projectId: "test",
+                userId: "test",
+                nameSpace: "new",
+                text: userQuestion
+            });
+            const { answer } = response.data;
             setMessages([...messages, {
                 message: userQuestion,
                 sentTime: "just now",
@@ -55,24 +62,41 @@ export default function CreateProject() {
                 direction: "outgoing",
                 position: "last"
             },{
-                message: "response",
+                message: answer,
                 sentTime: "just now",
                 sender: "Chatbot",
                 direction: "incoming",
                 position: "last"
             }])
             setLoading(false)
-        }, 3000)
+        } catch (error : any ) {
+            console.error(error.response.data);
+            toast({
+                title: 'Cannot receive a response',
+                description: error.message,
+                status: 'error',
+                duration: 5000,
+                isClosable: true,
+            })
+        }
     }
     React.useEffect(() => {
         console.log(messages);
     }, [messages])
+    //protected page
+    const getLocalStorageItem = (key: string) => {
+        if (typeof window !== undefined && window.localStorage.getItem(key)){
+        return window.localStorage.getItem(key)
+        }
+    };
     React.useEffect(() => {
-        console.log(user)
-        if(user == null){
+        setJwtToken(getLocalStorageItem("jwt"));
+        if(typeof window !== "undefined" && localStorage.getItem("jwt")){
+        }
+        else{
             router.push('/auth')
         }
-    }, [])
+    }, []);
     return (
         <>
         <Head>
@@ -82,7 +106,7 @@ export default function CreateProject() {
             <link rel="icon" href="/favicon.ico" />
         </Head>
         {
-            user != null? (
+            jwt != null? (
                 <main>
                     <Container marginY="20">
                     <Text fontSize="xl">Your Role Prompt</Text>

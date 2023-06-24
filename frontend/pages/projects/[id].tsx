@@ -1,64 +1,158 @@
 import Head from 'next/head'
 import React from 'react'
-import { Button, Card, Container, Flex, Input, InputGroup, InputRightElement, Spacer, Tab, TabList, TabPanel, TabPanels, Table, TableContainer, Tabs, Tbody, Td, Text, Textarea, Th, Thead, Tr } from '@chakra-ui/react'
-import moment from 'moment'
-import { useRouter } from 'next/router'
+import { Button, Card, Container, Flex, Input, InputGroup, InputRightElement, Spacer, Tab, TabList, TabPanel, TabPanels, Table, TableContainer, Tabs, Tbody, Td, Text, Textarea, Th, Thead, Tr, useToast } from '@chakra-ui/react'
 import { useAppContext } from '@/context/auth'
-import Link from 'next/link'
-import { AddIcon, ArrowForwardIcon, ArrowRightIcon, CloseIcon } from '@chakra-ui/icons'
-
+import { AddIcon, CloseIcon } from '@chakra-ui/icons'
+import axios from 'axios'
+import { useRouter } from 'next/router'
+import { headers } from 'next/dist/client/components/headers'
+import getConfig from 'next/config';
+const { publicRuntimeConfig } = getConfig();
 export default function Chatbot() {
-    const {user} = useAppContext()
+    const {jwt, setJwtToken} = useAppContext()
     const router = useRouter()
-    const [files, setFiles] = React.useState([])
-    const [youtubeLinks, setYoutubeLinks] = React.useState<string[]>([])
+    const { id } = router.query;
+    const projectId = id || ''; 
+    const toast = useToast()
+    const [files, setFiles] = React.useState<File | null>(null)
+    const [youtubeLinks, setYoutubeLinks] = React.useState<string>("")
     const [youtubeLinkInput, setYoutubeLinkInput] = React.useState('')
-    const [webLinks, setWebLinks] = React.useState<string[]>([])
     const [webLinkInput, setWebLinkInput] = React.useState('')
-    const [testPrompt, setTestPrompt] = React.useState("")
     const [loading, setLoading] = React.useState(false)
+    const [userQuestion, setUserQuestion] = React.useState("")
     const [response, setResponse] = React.useState("")
-    React.useEffect(() => {
-        console.log(user)
-        if(user == null){
-            router.push('/auth')
+    const addYoutubeLink = async () => {
+        try{
+            setLoading(true)
+            const response = await axios.post('/api/youtube_pass', {
+                url: youtubeLinkInput
+            })
+            setYoutubeLinks(response.data.url)
+            setYoutubeLinkInput("")
+            setLoading(false)
         }
-    }, [])
-    const saveProject = () => {
-        console.log("saving...")
-    }
-    const addYoutubeLink = () => {
-        setYoutubeLinks([...youtubeLinks, youtubeLinkInput])
-        console.log([...youtubeLinks, youtubeLinkInput])
+        catch(err: any){
+            console.log(err)
+            toast({
+                title: 'Upload YouTube link failed',
+                description: err.message,
+                status: 'error',
+                duration: 5000,
+                isClosable: true,
+            })
+            setLoading(false)
+        }
         setYoutubeLinkInput("")
     }
-    const addWebLinks = () => {
-        setWebLinks([...webLinks, webLinkInput])
-        console.log([...webLinks, webLinkInput])
+    const addWebLinks = async () => {
+        try{
+            setLoading(true)
+            const response = await axios.post('/api/webpage_read', {
+                url: webLinkInput
+            })
+            setYoutubeLinks(response.data.url)
+            setYoutubeLinkInput("")
+            setLoading(false)
+        }
+        catch(err: any){
+            console.log(err)
+            toast({
+                title: 'Upload webpage link failed',
+                description: err.message,
+                status: 'error',
+                duration: 5000,
+                isClosable: true,
+            })
+            setLoading(false)
+        }
         setWebLinkInput("")
     }
     const selectFile = () => {
         let file_selector = document.getElementById("file-selector")
         file_selector?.click()
     }
-    const handleFile = (fileList: any) => {
-        fileList!=null?setFiles(files.concat(...fileList)):null
-    }
+    const useFile = (event: React.ChangeEvent<HTMLInputElement>) => {
 
-    const handleFileChange = (e : any) => {
-        const files = Array.from(e.target.files);
-        handleFile(files)
+        const fileList = event.target.files;
+        console.log(fileList[0]);
+        fileList != null ? setFiles(fileList[0]) : setFiles(null);
       };
+    const uploadFile = async (file: any) => {
+
+
+        try {
+            let bodyFormData = new FormData();
+            bodyFormData.append("file", file);
+            bodyFormData.append("projectId", projectId);
+
+            
+            const response = await axios.post(`${publicRuntimeConfig.API_ENDPOINT}/builder/uploadFile`, bodyFormData , { headers: {
+                "Content-Type": "multipart/form-data",
+                'token': localStorage.getItem("jwt")
+
+              }});
+            console.log(response.data)
+            toast({
+                title: 'Upload file File uploaded successfully',
+                description: response.data.message,
+                status: 'success',
+                duration: 5000,
+                isClosable: true,
+            })
+                    
+        } catch (error: any) {
+            console.log(error)
+            toast({
+                title: 'Upload file failed',
+                description: error.message,
+                status: 'error',
+                duration: 5000,
+                isClosable: true,
+            })
+            setLoading(false)
+        }
+    }
     React.useEffect(() => {
         console.log(files)
     }, [files])
-    const submitChat = () => {
+    const submitChat = async () => {
         setLoading(true)
-        setTimeout(()=> {
-            setResponse("response")
+        try {
+            const response = await axios.post('/api/chatting', {
+                projectId: "test",
+                userId: "test",
+                nameSpace: "new",
+                text: userQuestion
+            });
+            const { answer } = response.data;
+            setResponse(answer)
             setLoading(false)
-        }, 3000)
+        } catch (error : any ) {
+            console.error(error.response.data);
+            toast({
+                title: 'Cannot receive response',
+                description: "Please check your network connection and prompt",
+                status: 'error',
+                duration: 5000,
+                isClosable: true,
+            })
+        }
+        setLoading(false)
     }
+    //protected page
+    const getLocalStorageItem = (key: string) => {
+        if (typeof window !== undefined){
+        return window.localStorage.getItem(key)
+        }
+    };
+    React.useEffect(() => {
+        setJwtToken(getLocalStorageItem("jwt"));
+        if(typeof window !== "undefined" && localStorage.getItem("jwt")){
+        }
+        else{
+            router.push('/auth')
+        }
+    }, []);
     return (
         <>
         <Head>
@@ -68,7 +162,7 @@ export default function Chatbot() {
             <link rel="icon" href="/favicon.ico" />
         </Head>
         {
-            user != null? (
+            jwt !== null? (
                 <main>
                     <Container marginY="20">
                     <Text fontSize="2xl" textAlign='center' fontWeight='bold' marginBottom="8">project_name</Text>
@@ -90,24 +184,26 @@ export default function Chatbot() {
                             }}
                             accept=".doc, .docx, .pdf"
                             display="none"
-                            multiple
-                            onChange={handleFileChange}
+                            onChange={useFile}
                             border="0"
                             key={0}
                             id="file-selector"
                         />
                         {
-                            files.map((file: File, index) => {
-                                return(
-                                    <Flex gap="1" marginLeft="2" key={file.name}>
-                                        <Text fontSize="md" key={index} letterSpacing="0">{file.name}</Text>
-                                        <Spacer />
-                                        <Button variant="link" onClick={()=>setFiles(files.filter((value: File)=>value.name!=file.name))}>
-                                            <CloseIcon color="red.500" />
-                                        </Button>
-                                    </Flex>
-                                )
-                            })
+                            files != null
+                            ?(
+                                <Flex gap="1" marginLeft="2">
+                                    <Text fontSize="md" letterSpacing="0">{files.name}</Text>
+                                    <Spacer />
+                                    <Button variant="link" onClick={()=>setFiles(null)}>
+                                        <CloseIcon color="red.500" />
+                                    </Button>
+                                    <Button variant="link" onClick={()=>uploadFile(files)}>
+                                        <AddIcon color="green.500" />
+                                    </Button>
+                                </Flex>
+                            )
+                            :null
                         }
                         <Text fontSize="md" marginTop="2">Please enter web URLs here:</Text>
                         <InputGroup>
@@ -116,19 +212,6 @@ export default function Chatbot() {
                                 <Button onClick={()=>addWebLinks()} variant="link" isDisabled={webLinkInput.length==0}><AddIcon color='green.500' /></Button>
                             </InputRightElement>
                         </InputGroup>
-                        {
-                            webLinks.map((link, index) => {
-                                return(
-                                    <Flex gap="1" marginLeft="2" key={link}>
-                                        <Text fontSize="md" key={link} letterSpacing="0">{link}</Text>
-                                        <Spacer />
-                                        <Button variant="link" onClick={()=>setWebLinks(webLinks.filter((value)=>value!=link))}>
-                                            <CloseIcon color="red.500" />
-                                        </Button>
-                                    </Flex>
-                                )
-                            })
-                        }
                         <Text fontSize="md" marginTop="2">Please enter YouTube Links here:</Text>
                         <InputGroup>
                             <Input placeholder='Youtube Link:' value={youtubeLinkInput} onChange={(e)=>setYoutubeLinkInput(e.target.value)} />
@@ -136,37 +219,17 @@ export default function Chatbot() {
                                 <Button onClick={()=>addYoutubeLink()} variant="link" isDisabled={youtubeLinkInput.length==0}><AddIcon color='green.500' /></Button>
                             </InputRightElement>
                         </InputGroup>
-                        {
-                            youtubeLinks.map((link, index) => {
-                                return(
-                                    <Flex gap="1" marginLeft="2" key={link}>
-                                        <Text fontSize="md" key={link}>{link}</Text>
-                                        <Spacer />
-                                        <Button variant="link" onClick={()=>setYoutubeLinks(youtubeLinks.filter((value)=>value!=link))}>
-                                            <CloseIcon color="red.500" />
-                                        </Button>
-                                    </Flex>
-                                )
-                            })
-                        }
-                        <Flex marginTop="4">
-                            <Button onClick={()=>router.back()} bgColor="gray.200">Back</Button>   
-                            <Spacer />
-                            <Button onClick={() => saveProject()} bgColor="#91FF64" border="2px">
-                                Save
-                            </Button>
-                        </Flex>
                     </Card>
                     
                     <Card padding="4" gap="2" bgColor="gray.100" letterSpacing="0" marginTop="4">
                         <Text fontSize="lg" marginBottom="2" fontWeight="bold">Testing Section</Text>
-                        <Textarea placeholder='Enter a prompt to ask questions!' />
+                        <Textarea placeholder='Enter a prompt to ask questions!' value={userQuestion} onChange={(e)=>setUserQuestion(e.target.value)} />
                         <Flex marginTop="2">
                             <Spacer />
                             <Button bgColor="#91FF64" border="2px" onClick={()=>submitChat()} isLoading={loading}>Chat!</Button>
                         </Flex>
                         {
-                            response.length>0? (
+                            response !== ""? (
                                 <>
                                     <Text fontSize="lg" marginBottom="2" marginTop="4" fontWeight="bold">Response: </Text>
                                     <Text fontSize="md">{response}</Text>

@@ -1,27 +1,68 @@
 import Head from 'next/head'
 import React from 'react'
-import { Button, Card, Container, Flex, Input, Spacer, Tab, TabList, TabPanel, TabPanels, Table, TableContainer, Tabs, Tbody, Td, Text, Th, Thead, Tr } from '@chakra-ui/react'
+import { Button, Card, Container, Flex, Spacer, Table, TableContainer, Tbody, Td, Text, Th, Thead, Tr, useToast } from '@chakra-ui/react'
 import moment from 'moment'
 import { useRouter } from 'next/router'
 import { useAppContext } from '@/context/auth'
 import Link from 'next/link'
-import { AddIcon, ArrowForwardIcon, ArrowRightIcon } from '@chakra-ui/icons'
+import { AddIcon, ArrowForwardIcon, ArrowRightIcon, ChatIcon } from '@chakra-ui/icons'
 import CreateProjectModal from '@/components/create-project-modal'
+import axios from 'axios'
+
+type ProjectType = {
+    _id: string;
+    name: string;
+    role: string;
+    user_id: string;
+    chat_count: Number;
+    document_count: Number;
+    status: string;
+    create_at: string;
+}
 
 export default function ProjectList() {
-    const {user} = useAppContext()
+    const {jwt, setJwtToken} = useAppContext()
+    const [projects, setProjects] = React.useState<ProjectType[]>([])
     const router = useRouter()
+    const toast = useToast()
     React.useEffect(() => {
-        console.log(user)
-        if(user == null){
+        if(typeof window !== "undefined" && localStorage.getItem("jwt")){
+            const getProjects = async () => {
+                try {
+                    const response = await axios.get('/api/project', {
+                        headers: {
+                            'token': localStorage.getItem("jwt")
+                        }
+                    })
+                    setProjects(response.data.projects)
+                    console.log(response.data)
+                    setJwtToken(jwt)
+                } catch (error : any ) {
+                    console.error(error.response.data);
+                    toast({
+                        title: 'Cannot fetch your projects',
+                        description: "Please check your network connection",
+                        status: 'error',
+                        duration: 5000,
+                        isClosable: true,
+                    })
+                }
+            }
+            getProjects();
+        }
+        else{
             router.push('/auth')
         }
     }, [])
-    const sample_data = [
-        {name: "Project1", lastUpdated: Date.now(), id: '123'},
-        {name: "Project2", lastUpdated: Date.now(), id: '456'},
-        {name: "Project3", lastUpdated: Date.now(), id: '789'},
-    ]
+    //protected page
+    const getLocalStorageItem = (key: string) => {
+        if (typeof window !== undefined){
+        return window.localStorage.getItem(key)
+        }
+    };
+    React.useEffect(() => {
+        setJwtToken(getLocalStorageItem("jwt"));
+    }, []);
     return (
         <>
         <Head>
@@ -31,42 +72,63 @@ export default function ProjectList() {
             <link rel="icon" href="/favicon.ico" />
         </Head>
         {
-            user != null? (
+            jwt === null? <></>:(
                 <main>
-                    <Container marginY="20">
-                    <Text fontSize="2xl" textAlign='center' fontWeight='bold' marginBottom="12">New Projects</Text>
-                    <Text>Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequuntur culpa aspernatur tempore quod placeat sequi optio est voluptas enim illo voluptatibus dolor facilis fugit, dicta consequatur id soluta deleniti veritatis.</Text>
+                    <Container maxWidth="100ch" marginY="20">
+                    <Text fontSize="2xl" textAlign='center' fontWeight='bold' marginBottom="12">My Projects</Text>
+                    <Text marginBottom="2">Here are you list your projects.</Text>
+                    <Text marginBottom="2">Feel free to update each of it using links and files by clicking on the update column.</Text> 
+                    <Text>You can also chat with it by clicking the speech bubble icon!</Text>
                     <Flex>
                         <Spacer />
                         <CreateProjectModal />
                     </Flex>
-                    <TableContainer>
-                        <Table variant="striped" colorScheme="green">
-                            <Thead>
-                                <Tr>
-                                    <Th>Name</Th>
-                                    <Th>Last Updated</Th>
-                                    <Th>Visit Project</Th>
-                                </Tr>
-                            </Thead>
-                            <Tbody>
-                                {
-                                    sample_data.map((item) => {
-                                        return(
-                                        <Tr key={item.name}>
-                                            <Td>{item.name}</Td>
-                                            <Td>{moment(item.lastUpdated).format('lll')}</Td>
-                                            <Td textAlign="center"><Link href={`/projects/${item.id}`}><Button variant="link"><ArrowForwardIcon w="6" h="6" /></Button></Link></Td>
+                    {
+                        projects.length>0
+                        ?(
+                            <TableContainer>
+                                <Table variant="striped" colorScheme="green">
+                                    <Thead>
+                                        <Tr>
+                                            <Th>Name</Th>
+                                            <Th>Role</Th>
+                                            <Th>Status</Th>
+                                            <Th>Created At</Th>
+                                            <Th>Update</Th>
+                                            <Th>Chat</Th>
                                         </Tr>
-                                        )
-                                    })
-                                }
-                            </Tbody>
-                        </Table>
-                    </TableContainer>
+                                    </Thead>
+                                    <Tbody>
+                                        {projects.map((item) => {
+                                            return(
+                                            <Tr key={item.name}>
+                                                <Td>{item.name}</Td>
+                                                <Td>{item.role}</Td>
+                                                <Td>{item.status}</Td>
+                                                <Td>{moment(item.create_at).format("lll")}</Td>
+                                                <Td><Link href={`/projects/${item._id}`}><Button variant="link"><ArrowForwardIcon w="6" h="6" /></Button></Link></Td>
+                                                <Td><Link href={`/chatbot/${item._id}`}><Button variant="link"><ChatIcon w="6" h="6" /></Button></Link></Td>
+                                            </Tr>
+                                            )
+                                        }
+                                    )}
+                                    </Tbody>
+                                </Table>
+                            </TableContainer>
+                        )
+                        :(
+                            <>
+                                <Text fontSize="2xl" marginTop="10" textColor="gray.400" fontWeight="bold" textAlign="center">Seems like you don't have any projects</Text>
+                                <Text fontSize="2xl" marginTop="2" textColor="gray.400" fontWeight="bold" textAlign="center">Let's create a new one!</Text>
+                            </>
+                        )
+
+                    }
+                    
+                    
                     </Container>
                 </main>
-            ):<></>
+            )
         }
     </>
     )

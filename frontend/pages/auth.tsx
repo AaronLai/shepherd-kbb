@@ -1,12 +1,13 @@
 import Head from 'next/head'
-import React, { ChangeEvent, FormEvent } from 'react'
-import { Button, Card, Container, Flex, Input, Spacer, Tab, TabList, TabPanel, TabPanels, Tabs, Text } from '@chakra-ui/react'
+import React from 'react'
+import { Button, Card, Container, Flex, Input, Spacer, Tab, TabList, TabPanel, TabPanels, Tabs, Text, useToast } from '@chakra-ui/react'
 import { useAppContext } from "../context/auth"
 import { useRouter } from 'next/router'
 import axios from 'axios';
 
 export default function Auth() {
-  const {setUser} = useAppContext()
+  const {setJwtToken} = useAppContext()
+  const toast = useToast()
   const router = useRouter()
   const [loginUser, setLoginUser] = React.useState({
     email: '',
@@ -30,11 +31,42 @@ export default function Auth() {
       const { jwt } = response.data;
   
       localStorage.setItem('jwt', jwt);
+      setJwtToken(jwt)
+      router.push('/projects');
+    } catch (error: any) {
+      console.log(error)
+      toast({
+          title: 'Login failed',
+          description: error.message,
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+      })
+    }
+  };
+
+  const handleSignup = async () => {
+    try {
+      const response = await axios.post('/api/signup', {
+        email: signupUser.email,
+        name: signupUser.username,
+        password: signupUser.password,
+      });
   
-      // Redirect to the protected page or perform any other action
-      // ...
+      const { jwt } = response.data;
+  
+      localStorage.setItem('jwt', jwt);
+      setJwtToken(jwt)
+      router.push('/projects');
     } catch (error : any ) {
       console.error(error.response.data);
+      toast({
+          title: 'Sign up failed',
+          description: error.message,
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+      })
     }
   };
 
@@ -101,7 +133,7 @@ export default function Auth() {
                 <Input placeholder='Re-enter your password' type="password" value={signupUser.password2} onChange={handleSignupInput} id="password2" marginY="2" />
                 <Flex>
                   <Spacer />
-                  <Button isDisabled={!isValid()} bgColor="#91FF64" border="2px">Sign Up</Button>
+                  <Button isDisabled={!isValid()} bgColor="#91FF64" border="2px" onClick={()=>handleSignup()}>Sign Up</Button>
                 </Flex>
                 </TabPanel>
               </TabPanels>
