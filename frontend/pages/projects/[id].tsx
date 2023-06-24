@@ -127,6 +127,7 @@ export default function Chatbot() {
                             display="none"
                             onChange={(e) => useFile(e.target.files)}
                             border="0"
+                            key={0}
                             id="file-selector"
                         />
                         {
