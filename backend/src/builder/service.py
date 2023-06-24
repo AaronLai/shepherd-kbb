@@ -10,6 +10,7 @@ from langchain.vectorstores import Pinecone
 from langchain.document_loaders import YoutubeLoader
 from langchain.document_loaders import WebBaseLoader
 from backend.src.loader.webPageLoader import WebPageLoader
+from backend.src.loader.youtubeLoader import SherherdYoutubeLoader
 
 
 
@@ -44,7 +45,7 @@ class BuilderService():
     
     def youtubeProcessing(self, url):
         try:
-            loader =YoutubeLoader.from_youtube_url(
+            loader =SherherdYoutubeLoader.from_youtube_url(
                         url, add_video_info=True
                     )
             data = loader.load()
@@ -66,7 +67,7 @@ class BuilderService():
         extension = file.filename.split(".")[-1].lower()
         if extension in ["pdf", "docx", "txt"]:
             try:
-                with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+                with tempfile.NamedTemporaryFile(prefix=file.filename,delete=False) as temp_file:
                     shutil.copyfileobj(file.file, temp_file)
                     if extension == "pdf":
                         loader = PyPDFLoader(temp_file.name)
