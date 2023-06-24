@@ -1,6 +1,6 @@
 import Head from 'next/head'
 import React from 'react'
-import { Button, Card, Container, Flex, Input, InputGroup, InputRightElement, Spacer, Tab, TabList, TabPanel, TabPanels, Table, TableContainer, Tabs, Tbody, Td, Text, Textarea, Th, Thead, Tr } from '@chakra-ui/react'
+import { Button, Card, Container, Flex, Input, InputGroup, InputRightElement, Spacer, Tab, TabList, TabPanel, TabPanels, Table, TableContainer, Tabs, Tbody, Td, Text, Textarea, Th, Thead, Tr, useToast } from '@chakra-ui/react'
 import moment from 'moment'
 import { useRouter } from 'next/router'
 import { useAppContext } from '@/context/auth'
@@ -11,7 +11,7 @@ import axios from 'axios'
 
 export default function Chatbot() {
     const {jwt, setJwtToken} = useAppContext()
-    const router = useRouter()
+    const toast = useToast()
     const [files, setFiles] = React.useState<File | null>(null)
     const [youtubeLinks, setYoutubeLinks] = React.useState<string>("")
     const [youtubeLinkInput, setYoutubeLinkInput] = React.useState('')
@@ -19,10 +19,8 @@ export default function Chatbot() {
     const [webLinkInput, setWebLinkInput] = React.useState('')
     const [testPrompt, setTestPrompt] = React.useState("")
     const [loading, setLoading] = React.useState(false)
+    const [userQuestion, setUserQuestion] = React.useState("")
     const [response, setResponse] = React.useState("")
-    const saveProject = () => {
-        console.log("saving...")
-    }
     const addYoutubeLink = async () => {
         try{
             setLoading(true)
@@ -33,8 +31,16 @@ export default function Chatbot() {
             setYoutubeLinkInput("")
             setLoading(false)
         }
-        catch(err){
+        catch(err: any){
             console.log(err)
+            toast({
+                title: 'Upload YouTube link failed',
+                description: err.message,
+                status: 'error',
+                duration: 5000,
+                isClosable: true,
+            })
+            setLoading(false)
         }
         setYoutubeLinkInput("")
     }
@@ -48,8 +54,16 @@ export default function Chatbot() {
             setYoutubeLinkInput("")
             setLoading(false)
         }
-        catch(err){
+        catch(err: any){
             console.log(err)
+            toast({
+                title: 'Upload webpage link failed',
+                description: err.message,
+                status: 'error',
+                duration: 5000,
+                isClosable: true,
+            })
+            setLoading(false)
         }
         setWebLinkInput("")
     }
@@ -64,26 +78,47 @@ export default function Chatbot() {
         try {
             let bodyFormData = new FormData();
             bodyFormData.append("file", file);
-            const response = await axios.post("/api/file_upload", {file: file}, {
-                headers: {
-                    "Content-Type": "multipart/form-data"
-                }
-            })
+            const response = await axios.post("/api/file_upload", bodyFormData)
             console.log(response.data)
                     
-        } catch (error) {
+        } catch (error: any) {
             console.log(error)
+            toast({
+                title: 'Upload file failed',
+                description: error.message,
+                status: 'error',
+                duration: 5000,
+                isClosable: true,
+            })
+            setLoading(false)
         }
     }
     React.useEffect(() => {
         console.log(files)
     }, [files])
-    const submitChat = () => {
+    const submitChat = async () => {
         setLoading(true)
-        setTimeout(()=> {
-            setResponse("response")
+        try {
+            const response = await axios.post('/api/chatting', {
+                projectId: "test",
+                userId: "test",
+                nameSpace: "new",
+                text: userQuestion
+            });
+            const { answer } = response.data;
+            setResponse(answer)
             setLoading(false)
-        }, 3000)
+        } catch (error : any ) {
+            console.error(error.response.data);
+            toast({
+                title: 'Cannot receive response',
+                description: "Please check your network connection and prompt",
+                status: 'error',
+                duration: 5000,
+                isClosable: true,
+            })
+        }
+        setLoading(false)
     }
     //protected page
     const getLocalStorageItem = (key: string) => {
@@ -160,24 +195,17 @@ export default function Chatbot() {
                                 <Button onClick={()=>addYoutubeLink()} variant="link" isDisabled={youtubeLinkInput.length==0}><AddIcon color='green.500' /></Button>
                             </InputRightElement>
                         </InputGroup>
-                        <Flex marginTop="4">
-                            <Button onClick={()=>router.back()} bgColor="gray.200">Back</Button>   
-                            <Spacer />
-                            <Button onClick={() => saveProject()} bgColor="#91FF64" border="2px">
-                                Save
-                            </Button>
-                        </Flex>
                     </Card>
                     
                     <Card padding="4" gap="2" bgColor="gray.100" letterSpacing="0" marginTop="4">
                         <Text fontSize="lg" marginBottom="2" fontWeight="bold">Testing Section</Text>
-                        <Textarea placeholder='Enter a prompt to ask questions!' />
+                        <Textarea placeholder='Enter a prompt to ask questions!' value={userQuestion} onChange={(e)=>setUserQuestion(e.target.value)} />
                         <Flex marginTop="2">
                             <Spacer />
                             <Button bgColor="#91FF64" border="2px" onClick={()=>submitChat()} isLoading={loading}>Chat!</Button>
                         </Flex>
                         {
-                            response.length>0? (
+                            response !== ""? (
                                 <>
                                     <Text fontSize="lg" marginBottom="2" marginTop="4" fontWeight="bold">Response: </Text>
                                     <Text fontSize="md">{response}</Text>

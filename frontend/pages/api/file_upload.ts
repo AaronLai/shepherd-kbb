@@ -6,19 +6,18 @@ const { publicRuntimeConfig } = getConfig();
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {
     if (req.method === 'POST') {
-        const { file } = req.body as { file: File };
         try {
+            const file = req.body;
+            const response = await axios.post(`${publicRuntimeConfig.API_ENDPOINT}/builder/uploadFile`, {file: file}
+            );
 
-        const response = await axios.post(`${publicRuntimeConfig.API_ENDPOINT}/builder/uploadFile`, {
-            file
-        });
-
-        const { detail } = response.data;
-        res.status(200).json({ detail });
-        } catch (error : any) {
+            const { detail } = response.data;
+            res.status(200).json({ detail });
+            } catch (error : any) {
 
 
-        res.status(error.response.status).json({ error: error.message });
+                res.status(error.response.status).json({ error: error.message });
+                console.log(error.response.data);
         }
     } else {
         res.status(405).json({ error: 'Method not allowed' });

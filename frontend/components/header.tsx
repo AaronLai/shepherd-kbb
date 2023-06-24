@@ -9,6 +9,7 @@ export default function Header(){
     const router = useRouter()
     const logout = () => {
         setJwtToken("")
+        localStorage.removeItem("jwt")
         router.push('/auth')
     }
     return(
@@ -21,7 +22,6 @@ export default function Header(){
             <Box marginX="10">
                 <Flex gap="10">
                     <Link href="/projects"><Text>Projects</Text></Link>
-                    <Link href="/chatbot/123"><Text>Chatbox</Text></Link>
                 </Flex>
             </Box>
             <Spacer />

@@ -13,25 +13,31 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
           'token': req.headers['token']
         }
       })
-      const { detail } = response.data;
-      console.log(response.data);
-      res.status(200).json({ detail });
+      const { projects } = response.data;
+      console.log(projects)
+      res.status(200).json({ projects });
     } catch (error : any) {
       res.status(error.response.status).json({ error: error.message });
     }
   } 
   else if (req.method === 'POST'){
-    const { name, role } = req.body as { name: string; role: string; };
+    const { name, role, status } = req.body as { name: string; role: string; status: string };
     try {
 
       const response = await axios.post(`${publicRuntimeConfig.API_ENDPOINT}/project`, {
         name,
         role,
+        status
+      },
+      {
+        headers: {
+          'token': req.headers['token']
+        }
       });
 
-      const { detail } = response.data;
-      console.log(detail)
-      res.status(200).json({ detail });
+      const { project } = response.data;
+      console.log(project)
+      res.status(200).json({ project });
     } catch (error : any) {
 
 

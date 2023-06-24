@@ -19,10 +19,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       const { answer } = response.data;
       console.log(answer);
       res.status(200).json({ answer });
-      return answer
     } catch (error : any) {
-
-
       res.status(error.response.status).json({ error: error.message });
     }
   } else {

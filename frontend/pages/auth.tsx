@@ -1,12 +1,13 @@
 import Head from 'next/head'
 import React, { ChangeEvent, FormEvent } from 'react'
-import { Button, Card, Container, Flex, Input, Spacer, Tab, TabList, TabPanel, TabPanels, Tabs, Text } from '@chakra-ui/react'
+import { Button, Card, Container, Flex, Input, Spacer, Tab, TabList, TabPanel, TabPanels, Tabs, Text, useToast } from '@chakra-ui/react'
 import { useAppContext } from "../context/auth"
 import { useRouter } from 'next/router'
 import axios from 'axios';
 
 export default function Auth() {
   const {setJwtToken} = useAppContext()
+  const toast = useToast()
   const router = useRouter()
   const [loginUser, setLoginUser] = React.useState({
     email: '',
@@ -32,8 +33,15 @@ export default function Auth() {
       localStorage.setItem('jwt', jwt);
       setJwtToken(jwt)
       router.push('/projects');
-    } catch (error : any ) {
-      console.error(error.response.data);
+    } catch (error: any) {
+      console.log(error)
+      toast({
+          title: 'Login failed',
+          description: error.message,
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+      })
     }
   };
 
@@ -52,6 +60,13 @@ export default function Auth() {
       router.push('/projects');
     } catch (error : any ) {
       console.error(error.response.data);
+      toast({
+          title: 'Sign up failed',
+          description: error.message,
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+      })
     }
   };
 

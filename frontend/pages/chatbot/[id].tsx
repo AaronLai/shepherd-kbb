@@ -1,6 +1,6 @@
 import Head from 'next/head'
 import React from 'react'
-import { Box, Button, Card, Container, Flex, Input, InputGroup, InputRightElement, Spacer, Tab, TabList, TabPanel, TabPanels, Table, TableContainer, Tabs, Tbody, Td, Text, Textarea, Th, Thead, Tr, position } from '@chakra-ui/react'
+import { Box, Button, Card, Container, Flex, Input, InputGroup, InputRightElement, Spacer, Tab, TabList, TabPanel, TabPanels, Table, TableContainer, Tabs, Tbody, Td, Text, Textarea, Th, Thead, Tr, position, useToast } from '@chakra-ui/react'
 import moment from 'moment'
 import { useRouter } from 'next/router'
 import { useAppContext } from '@/context/auth'
@@ -26,7 +26,7 @@ type MessageType = {
 
 export default function CreateProject() {
     const {jwt, setJwtToken} = useAppContext()
-    const router = useRouter()
+    const toast = useToast()
     const [rolePrompt, setRolePrompt] = React.useState("")
     const [userQuestion, setUserQuestion] = React.useState("")
     const [loading, setLoading] = React.useState(false)
@@ -72,6 +72,13 @@ export default function CreateProject() {
             setLoading(false)
         } catch (error : any ) {
             console.error(error.response.data);
+            toast({
+                title: 'Cannot receive a response',
+                description: error.message,
+                status: 'error',
+                duration: 5000,
+                isClosable: true,
+            })
         }
     }
     React.useEffect(() => {

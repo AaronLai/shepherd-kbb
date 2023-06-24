@@ -1,25 +1,53 @@
 import { AddIcon } from "@chakra-ui/icons"
-import { useDisclosure, Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, Text, Input } from "@chakra-ui/react"
+import { useDisclosure, Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, Text, Input, Select, useToast } from "@chakra-ui/react"
 import React from "react"
 import axios from "axios"
 
 export default function CreateProjectModal() {
     const { isOpen, onOpen, onClose } = useDisclosure()
-    const [projectName, setProjectName] = React.useState('')
+    const toast = useToast()
+    const [name, setName] = React.useState('')
     const [role, setRole] = React.useState('')
+    const [visibility, setVisibility] = React.useState("Private")
     const createProject = async () => {
       await axios.post('/api/project', {
-          name: projectName,
-          role: role
+          name: name,
+          role: role,
+          status: visibility
+      },
+      {
+        headers: {
+          token: localStorage.getItem('jwt')
+        }
       }).then((res) => {
           console.log(res.data)
+          toast({
+            title: 'Successfully created project!',
+            status: 'success',
+            duration: 3000,
+            isClosable: true,
+        })
+          setTimeout(() => {
+            window.location.reload()
+          }, 3000)
       })
-      onClose()
-      setProjectName("")
+      .catch((error: Error) => {
+        console.log(error)
+        toast({
+            title: 'Cannot create project',
+            description: error.message,
+            status: 'error',
+            duration: 5000,
+            isClosable: true,
+        })
+      })
     }
     const nameIsValid = () => {
-        return projectName.length > 5 && projectName.length < 46
+        return name.length > 5 && name.length < 46 && (visibility == "private" || visibility == "public")
     }
+    React.useEffect(() => {
+      console.log(visibility)
+    }, [visibility])
     return (
       <>
         <Button bgColor="#91FF64" size="lg" marginY="4" onClick={onOpen}><AddIcon w="4" h="4" mr="2" /><Text fontSize="md">New Project</Text></Button>
@@ -33,11 +61,18 @@ export default function CreateProjectModal() {
               <Text mb='1rem'>
                 What is the name of your new project?
               </Text>
-              <Input placeholder='Project Name' value={projectName} onChange={(e)=>setProjectName(e.target.value)} />
+              <Input placeholder='Project Name' value={name} onChange={(e)=>setName(e.target.value)} />
               <Text mb='1rem' marginTop="4">
                 What is your role?
               </Text>
               <Input placeholder='Role' value={role} onChange={(e)=>setRole(e.target.value)} />
+              <Text mb='1rem' marginTop="4">
+                What is the visibility of your project?
+              </Text>
+              <Select placeholder='Select visibility' onChange={(e)=>setVisibility(e.target.value)}>
+                <option value='private'>Private</option>
+                <option value='public'>Public</option>
+              </Select>
             </ModalBody>
             <ModalFooter>
               <Button variant="ghost" mr={3} onClick={onClose}>
