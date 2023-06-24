@@ -1,10 +1,7 @@
 import Head from 'next/head'
 import React from 'react'
-import { Box, Button, Card, Container, Flex, Input, InputGroup, InputRightElement, Spacer, Tab, TabList, TabPanel, TabPanels, Table, TableContainer, Tabs, Tbody, Td, Text, Textarea, Th, Thead, Tr, position, useToast } from '@chakra-ui/react'
-import moment from 'moment'
-import { useRouter } from 'next/router'
+import { Container, Flex, Text, Textarea, useToast } from '@chakra-ui/react'
 import { useAppContext } from '@/context/auth'
-import Link from 'next/link'
 import "@chatscope/chat-ui-kit-styles/dist/default/styles.min.css";
 import {
   MainContainer,

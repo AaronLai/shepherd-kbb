@@ -1,6 +1,6 @@
 import Head from 'next/head'
 import React from 'react'
-import { Button, Card, Container, Flex, Input, Spacer, Tab, TabList, TabPanel, TabPanels, Table, TableContainer, Tabs, Tbody, Td, Text, Th, Thead, Tr, useToast } from '@chakra-ui/react'
+import { Button, Card, Container, Flex, Spacer, Table, TableContainer, Tbody, Td, Text, Th, Thead, Tr, useToast } from '@chakra-ui/react'
 import moment from 'moment'
 import { useRouter } from 'next/router'
 import { useAppContext } from '@/context/auth'

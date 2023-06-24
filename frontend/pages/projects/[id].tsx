@@ -1,12 +1,8 @@
 import Head from 'next/head'
 import React from 'react'
 import { Button, Card, Container, Flex, Input, InputGroup, InputRightElement, Spacer, Tab, TabList, TabPanel, TabPanels, Table, TableContainer, Tabs, Tbody, Td, Text, Textarea, Th, Thead, Tr, useToast } from '@chakra-ui/react'
-import moment from 'moment'
-import { useRouter } from 'next/router'
 import { useAppContext } from '@/context/auth'
-import Link from 'next/link'
-import { AddIcon, ArrowForwardIcon, ArrowRightIcon, CloseIcon } from '@chakra-ui/icons'
-import { pass_youtube, upload_file } from '@/query/builder'
+import { AddIcon, CloseIcon } from '@chakra-ui/icons'
 import axios from 'axios'
 
 export default function Chatbot() {
@@ -15,9 +11,7 @@ export default function Chatbot() {
     const [files, setFiles] = React.useState<File | null>(null)
     const [youtubeLinks, setYoutubeLinks] = React.useState<string>("")
     const [youtubeLinkInput, setYoutubeLinkInput] = React.useState('')
-    const [webLinks, setWebLinks] = React.useState<string>("")
     const [webLinkInput, setWebLinkInput] = React.useState('')
-    const [testPrompt, setTestPrompt] = React.useState("")
     const [loading, setLoading] = React.useState(false)
     const [userQuestion, setUserQuestion] = React.useState("")
     const [response, setResponse] = React.useState("")
