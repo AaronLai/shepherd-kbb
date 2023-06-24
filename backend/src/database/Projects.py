@@ -44,6 +44,10 @@ class ProjectDBService():
             Projects.create_table(read_capacity_units=10, write_capacity_units=10, wait=True)
         pass
 
+    def search_project_by_id(self, id: str):
+        result = Projects.get(id)
+        return result
+
     def create_project(self, user_id, name, role):
         new_id = str(uuid.uuid4()).replace('-', '')
         new_project = Projects(
