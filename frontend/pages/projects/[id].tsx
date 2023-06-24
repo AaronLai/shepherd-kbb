@@ -76,6 +76,13 @@ export default function Chatbot() {
             bodyFormData.append("file", file);
             const response = await axios.post("/api/file_upload", bodyFormData)
             console.log(response.data)
+            toast({
+                title: 'Upload file File uploaded successfully',
+                description: response.data.message,
+                status: 'success',
+                duration: 5000,
+                isClosable: true,
+            })
                     
         } catch (error: any) {
             console.log(error)

@@ -7,15 +7,13 @@ const { publicRuntimeConfig } = getConfig();
 export default async function (req: NextApiRequest, res: NextApiResponse) {
     if (req.method === 'POST') {
         try {
-            const file = req.body;
-            const response = await axios.post(`${publicRuntimeConfig.API_ENDPOINT}/builder/uploadFile`, {file: file}
+            const {file} = req.body as {file: File}
+            console.log(file);
+            const response = await axios.post(`${publicRuntimeConfig.API_ENDPOINT}/builder/uploadFile`, {file}
             );
-
-            const { detail } = response.data;
-            res.status(200).json({ detail });
+            const { status, message } = response.data;
+            res.status(200).json({ status, message });
             } catch (error : any) {
-
-
                 res.status(error.response.status).json({ error: error.message });
                 console.log(error.response.data);
         }
