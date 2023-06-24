@@ -5,6 +5,8 @@ from jose import JWTError, jwt
 from backend.config import Settings, get_settings
 from backend.src.database.Users import userDBService
 
+from backend.src.database.Projects import projectDBService
+
 def register_user(name, email, password):
     if(len(userDBService.search_by_email(email=email)) != 0):
         raise HTTPException(
@@ -59,3 +61,10 @@ def get_user_from_jwt(token: str):
 
     return (user)
     
+def is_project_owner(user_id: str, project_id: str):
+    project = projectDBService.search_project_by_id(project_id)
+    if(not project):
+        raise HTTPException(status_code=404, detail="Project not found")
+
+    if(project.user_id != user._id):
+        raise HTTPException(status_code=401, detail="You don't have access to this project")
