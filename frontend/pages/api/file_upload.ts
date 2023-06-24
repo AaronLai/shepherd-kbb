@@ -11,21 +11,38 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     if (req.method === 'POST') {
         try {
 
-              const form = formidable({});
-              
+            const form = formidable({});
+
 
             form.parse(req, async (err, fields, files) => {
-            
+
                 if (err) {
                     console.error('Error parsing form data:', err);
                     res.status(500).json({ error: 'Internal Server Error' });
                     return;
                 }
 
-                const file = fs.createReadStream(files.file[0].filepath);
+                let file;
                 const formData = new FormData();
-                formData.append('file', file, files.file[0].originalFilename);
-                formData.append('projectId', fields.projectId[0]);
+
+                if (Array.isArray(files.file)) {
+                    // handle case where files.file is an array
+                    file = fs.createReadStream(files.file[0].filepath);
+
+                } else {
+                    // handle case where files.file is a single object
+                    file = fs.createReadStream(files.file.filepath);
+
+
+                }
+
+                formData.append(
+                    'file',
+                    file,
+                    (Array.isArray(files.file) ? files.file[0].originalFilename : files.file.originalFilename) || 'default_filename'
+                );
+
+                formData.append('projectId',fields.projectId[0]);
 
                 const response = await axios.post(`${publicRuntimeConfig.API_ENDPOINT}/builder/uploadFile`, formData, {
                     headers: {
@@ -33,11 +50,11 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
                         'token': req.headers["token"]
                     },
                 });
-                
+
                 const { status, message } = response.data;
                 res.status(200).json({ status, message });
             });
-        } catch (error) {
+        } catch (error: any) {
 
             console.log(error.response?.data);
 
@@ -52,6 +69,6 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
 
 export const config = {
     api: {
-      bodyParser: false,
+        bodyParser: false,
     },
 };
