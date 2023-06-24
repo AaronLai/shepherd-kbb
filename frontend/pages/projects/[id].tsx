@@ -74,7 +74,6 @@ export default function Chatbot() {
     const useFile = (event: React.ChangeEvent<HTMLInputElement>) => {
 
         const fileList = event.target.files;
-        console.log(fileList[0]);
         fileList != null ? setFiles(fileList[0]) : setFiles(null);
       };
     const uploadFile = async (file: any) => {
@@ -83,8 +82,12 @@ export default function Chatbot() {
         try {
             let bodyFormData = new FormData();
             bodyFormData.append("file", file);
-            bodyFormData.append("projectId", projectId);
-
+            if (Array.isArray(projectId)) {
+                // Assuming you want to use the first value from the array
+                bodyFormData.append("projectId", projectId[0]);
+              } else {
+                bodyFormData.append("projectId", projectId);
+              }
             
             const response = await axios.post(`${publicRuntimeConfig.API_ENDPOINT}/builder/uploadFile`, bodyFormData , { headers: {
                 "Content-Type": "multipart/form-data",
