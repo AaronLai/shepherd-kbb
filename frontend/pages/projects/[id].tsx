@@ -5,10 +5,14 @@ import { useAppContext } from '@/context/auth'
 import { AddIcon, CloseIcon } from '@chakra-ui/icons'
 import axios from 'axios'
 import { useRouter } from 'next/router'
-
+import { headers } from 'next/dist/client/components/headers'
+import getConfig from 'next/config';
+const { publicRuntimeConfig } = getConfig();
 export default function Chatbot() {
     const {jwt, setJwtToken} = useAppContext()
     const router = useRouter()
+    const { id } = router.query;
+    const projectId = id || ''; 
     const toast = useToast()
     const [files, setFiles] = React.useState<File | null>(null)
     const [youtubeLinks, setYoutubeLinks] = React.useState<string>("")
@@ -67,14 +71,26 @@ export default function Chatbot() {
         let file_selector = document.getElementById("file-selector")
         file_selector?.click()
     }
-    const useFile = (fileList: any) => {
-        fileList!=null?setFiles(fileList[0]):null
-    }
+    const useFile = (event: React.ChangeEvent<HTMLInputElement>) => {
+
+        const fileList = event.target.files;
+        console.log(fileList[0]);
+        fileList != null ? setFiles(fileList[0]) : setFiles(null);
+      };
     const uploadFile = async (file: any) => {
+
+
         try {
             let bodyFormData = new FormData();
             bodyFormData.append("file", file);
-            const response = await axios.post("/api/file_upload", bodyFormData)
+            bodyFormData.append("projectId", projectId);
+
+            
+            const response = await axios.post(`${publicRuntimeConfig.API_ENDPOINT}/builder/uploadFile`, bodyFormData , { headers: {
+                "Content-Type": "multipart/form-data",
+                'token': localStorage.getItem("jwt")
+
+              }});
             console.log(response.data)
             toast({
                 title: 'Upload file File uploaded successfully',
@@ -168,7 +184,7 @@ export default function Chatbot() {
                             }}
                             accept=".doc, .docx, .pdf"
                             display="none"
-                            onChange={(e) => useFile(e.target.files)}
+                            onChange={useFile}
                             border="0"
                             key={0}
                             id="file-selector"

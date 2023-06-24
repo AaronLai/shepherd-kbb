@@ -5,11 +5,16 @@ import getConfig from 'next/config';
 const { publicRuntimeConfig } = getConfig();
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {
+
+    const body = req.body
     if (req.method === 'POST') {
         try {
-            const file = req.body
-            console.log(file);
-            const response = await axios.post(`${publicRuntimeConfig.API_ENDPOINT}/builder/uploadFile`, {file}
+            console.log("file upload ",body);
+            const response = await axios.post(`${publicRuntimeConfig.API_ENDPOINT}/builder/uploadFile`, body , { headers: {
+                "Content-Type": "multipart/form-data",
+                'token': req.headers['token']
+
+              }}
             );
             const { status, message } = response.data;
             res.status(200).json({ status, message });
