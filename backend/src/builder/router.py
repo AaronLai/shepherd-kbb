@@ -24,10 +24,11 @@ pinecone.init(
             )
 
 @router.post('/uploadFile')
-async def upload(file: UploadFile = File(...), settings: Settings = Depends(get_settings)):
+async def upload(   user: Annotated[Users, Depends(verify_jwt_token)] ,  projectId: str = Form(...) , file: UploadFile = File(...),settings: Settings = Depends(get_settings)):
+    print(projectId)
     try:
         builderService = BuilderService(settings)
-        vector = builderService.embedFile(file, pinecone, embeddings, "new")
+        vector = builderService.embedFile(file, pinecone, embeddings, projectId)
         return {'status': 'success', 'message': 'File uploaded successfully!'}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
