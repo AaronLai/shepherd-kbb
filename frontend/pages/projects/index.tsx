@@ -53,7 +53,7 @@ export default function ProjectList() {
                                 {
                                     sample_data.map((item) => {
                                         return(
-                                        <Tr>
+                                        <Tr key={item.name}>
                                             <Td>{item.name}</Td>
                                             <Td>{moment(item.lastUpdated).format('lll')}</Td>
                                             <Td textAlign="center"><Link href={`/projects/${item.id}`}><Button variant="link"><ArrowForwardIcon w="6" h="6" /></Button></Link></Td>
