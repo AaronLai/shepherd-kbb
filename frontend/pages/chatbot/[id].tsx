@@ -26,6 +26,8 @@ export default function CreateProject() {
     const {jwt, setJwtToken} = useAppContext()
     const toast = useToast()
     const router = useRouter()
+    const { id } = router.query;
+    const projectId = id || ''; 
     const [rolePrompt, setRolePrompt] = React.useState("")
     const [userQuestion, setUserQuestion] = React.useState("")
     const [loading, setLoading] = React.useState(false)
@@ -49,9 +51,7 @@ export default function CreateProject() {
         setLoading(true)
         try {
             const response = await axios.post('/api/chatting', {
-                projectId: "test",
-                userId: "test",
-                nameSpace: "new",
+                projectId: projectId,
                 text: userQuestion
             });
             const { answer } = response.data;

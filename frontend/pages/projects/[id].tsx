@@ -89,8 +89,7 @@ export default function Chatbot() {
                 bodyFormData.append("projectId", projectId);
               }
             
-            const response = await axios.post(`${publicRuntimeConfig.API_ENDPOINT}/builder/uploadFile`, bodyFormData , { headers: {
-                "Content-Type": "multipart/form-data",
+            const response = await axios.post(`/api/file_upload`, bodyFormData , { headers: {
                 'token': localStorage.getItem("jwt")
 
               }});
