@@ -41,9 +41,14 @@ export default function Chatbot() {
         let file_selector = document.getElementById("file-selector")
         file_selector?.click()
     }
-    const useFile = (fileList: any) => {
+    const handleFile = (fileList: any) => {
         fileList!=null?setFiles(files.concat(...fileList)):null
     }
+
+    const handleFileChange = (e : any) => {
+        const files = Array.from(e.target.files);
+        handleFile(files)
+      };
     React.useEffect(() => {
         console.log(files)
     }, [files])
@@ -86,14 +91,15 @@ export default function Chatbot() {
                             accept=".doc, .docx, .pdf"
                             display="none"
                             multiple
-                            onChange={(e) => useFile(e.target.files)}
+                            onChange={handleFileChange}
                             border="0"
+                            key={0}
                             id="file-selector"
                         />
                         {
                             files.map((file: File, index) => {
                                 return(
-                                    <Flex gap="1" marginLeft="2">
+                                    <Flex gap="1" marginLeft="2" key={file.name}>
                                         <Text fontSize="md" key={index} letterSpacing="0">{file.name}</Text>
                                         <Spacer />
                                         <Button variant="link" onClick={()=>setFiles(files.filter((value: File)=>value.name!=file.name))}>
@@ -113,7 +119,7 @@ export default function Chatbot() {
                         {
                             webLinks.map((link, index) => {
                                 return(
-                                    <Flex gap="1" marginLeft="2">
+                                    <Flex gap="1" marginLeft="2" key={link}>
                                         <Text fontSize="md" key={link} letterSpacing="0">{link}</Text>
                                         <Spacer />
                                         <Button variant="link" onClick={()=>setWebLinks(webLinks.filter((value)=>value!=link))}>
@@ -133,7 +139,7 @@ export default function Chatbot() {
                         {
                             youtubeLinks.map((link, index) => {
                                 return(
-                                    <Flex gap="1" marginLeft="2">
+                                    <Flex gap="1" marginLeft="2" key={link}>
                                         <Text fontSize="md" key={link}>{link}</Text>
                                         <Spacer />
                                         <Button variant="link" onClick={()=>setYoutubeLinks(youtubeLinks.filter((value)=>value!=link))}>

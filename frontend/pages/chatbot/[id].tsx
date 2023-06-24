@@ -95,7 +95,7 @@ export default function CreateProject() {
                                 {
                                     messages.map((message, index) => {
                                         return(
-                                            <Message
+                                            <Message key={index}
                                                 model={message}
                                             />
                                         )
