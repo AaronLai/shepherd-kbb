@@ -4,9 +4,11 @@ import { Button, Card, Container, Flex, Input, InputGroup, InputRightElement, Sp
 import { useAppContext } from '@/context/auth'
 import { AddIcon, CloseIcon } from '@chakra-ui/icons'
 import axios from 'axios'
+import { useRouter } from 'next/router'
 
 export default function Chatbot() {
     const {jwt, setJwtToken} = useAppContext()
+    const router = useRouter()
     const toast = useToast()
     const [files, setFiles] = React.useState<File | null>(null)
     const [youtubeLinks, setYoutubeLinks] = React.useState<string>("")
@@ -122,6 +124,11 @@ export default function Chatbot() {
     };
     React.useEffect(() => {
         setJwtToken(getLocalStorageItem("jwt"));
+        if(typeof window !== "undefined" && localStorage.getItem("jwt")){
+        }
+        else{
+            router.push('/auth')
+        }
     }, []);
     return (
         <>

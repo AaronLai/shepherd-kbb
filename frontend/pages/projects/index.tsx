@@ -26,7 +26,7 @@ export default function ProjectList() {
     const router = useRouter()
     const toast = useToast()
     React.useEffect(() => {
-        if(typeof window !== "undefined" && localStorage.getItem("jwt") !== undefined){
+        if(typeof window !== "undefined" && localStorage.getItem("jwt")){
             const getProjects = async () => {
                 try {
                     const response = await axios.get('/api/project', {

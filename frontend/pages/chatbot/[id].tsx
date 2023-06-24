@@ -12,6 +12,7 @@ import {
   TypingIndicator,
 } from "@chatscope/chat-ui-kit-react";
 import axios from 'axios'
+import { useRouter } from 'next/router';
 
 type MessageType = {
     message: string,
@@ -24,6 +25,7 @@ type MessageType = {
 export default function CreateProject() {
     const {jwt, setJwtToken} = useAppContext()
     const toast = useToast()
+    const router = useRouter()
     const [rolePrompt, setRolePrompt] = React.useState("")
     const [userQuestion, setUserQuestion] = React.useState("")
     const [loading, setLoading] = React.useState(false)
@@ -83,12 +85,17 @@ export default function CreateProject() {
     }, [messages])
     //protected page
     const getLocalStorageItem = (key: string) => {
-        if (typeof window !== undefined){
+        if (typeof window !== undefined && window.localStorage.getItem(key)){
         return window.localStorage.getItem(key)
         }
     };
     React.useEffect(() => {
         setJwtToken(getLocalStorageItem("jwt"));
+        if(typeof window !== "undefined" && localStorage.getItem("jwt")){
+        }
+        else{
+            router.push('/auth')
+        }
     }, []);
     return (
         <>
@@ -99,7 +106,7 @@ export default function CreateProject() {
             <link rel="icon" href="/favicon.ico" />
         </Head>
         {
-            jwt !== null? (
+            jwt != null? (
                 <main>
                     <Container marginY="20">
                     <Text fontSize="xl">Your Role Prompt</Text>
