@@ -26,7 +26,7 @@ async def get_project_info(project_id: str):
 
 @router.post('')
 async def new_project(body: CreateProjectDTO, user: Annotated[Users, Depends(verify_jwt_token)]):
-    new_project = ProjectService.create_new_project(user, body.name, body.role)
+    new_project = ProjectService.create_new_project(user, body.name, body.role, body.status)
     return {
         'project': new_project.to_dict()
     }
