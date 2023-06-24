@@ -38,10 +38,10 @@ export default function ProjectList() {
                     console.log(response.data)
                     setJwtToken(jwt)
                 } catch (error : any ) {
-                    console.error(error.response.data);
+                    console.error(error);
                     toast({
-                        title: 'Cannot fetch your projects',
-                        description: "Please check your network connection",
+                        title: "Fetch fail",
+                        description: error.response.data.message,
                         status: 'error',
                         duration: 5000,
                         isClosable: true,
@@ -101,7 +101,7 @@ export default function ProjectList() {
                                     <Tbody>
                                         {projects.map((item) => {
                                             return(
-                                            <Tr key={item.name}>
+                                            <Tr key={item._id}>
                                                 <Td>{item.name}</Td>
                                                 <Td>{item.role}</Td>
                                                 <Td>{item.status}</Td>

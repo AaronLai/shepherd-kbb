@@ -23,7 +23,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     } catch (error : any) {
 
 
-      res.status(error.response.status).json({ error: error.message });
+      res.status(error.response.status).json({ message: error.response.data.detail });
     }
   } else {
     res.status(405).json({ error: 'Method not allowed' });

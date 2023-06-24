@@ -17,7 +17,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       console.log(projects)
       res.status(200).json({ projects });
     } catch (error : any) {
-      res.status(error.response.status).json({ error: error.message });
+      res.status(error.response.status).json({ message: error.response.data.detail });
     }
   } 
   else if (req.method === 'POST'){
@@ -36,12 +36,11 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       });
 
       const { project } = response.data;
-      console.log(project)
       res.status(200).json({ project });
     } catch (error : any) {
 
 
-      res.status(error.response.status).json({ error: error.message });
+      res.status(error.response.status).json({ message: error.response.data.detail });
     }
   }else {
     res.status(405).json({ error: 'Method not allowed' });
