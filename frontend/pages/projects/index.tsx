@@ -118,8 +118,8 @@ export default function ProjectList() {
                         )
                         :(
                             <>
-                                <Text fontSize="2xl" marginTop="10" textColor="gray.400" fontWeight="bold" textAlign="center">Seems like you don't have any projects</Text>
-                                <Text fontSize="2xl" marginTop="2" textColor="gray.400" fontWeight="bold" textAlign="center">Let's create a new one!</Text>
+                                <Text fontSize="2xl" marginTop="10" textColor="gray.400" fontWeight="bold" textAlign="center">Seems like you don&apos;t have any projects</Text>
+                                <Text fontSize="2xl" marginTop="2" textColor="gray.400" fontWeight="bold" textAlign="center">Let&apos;s create a new one!</Text>
                             </>
                         )
 
