@@ -58,7 +58,7 @@ class OpenAi():
 
     def get_chat_history(self,inputs) -> str:
         res = []
-        if len(inputs) <= 2:
+        if inputs is None or  len(inputs) <= 2:
             return ""
         
         data = inputs[1:]  # Remove the first dictionary from the list

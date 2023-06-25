@@ -44,7 +44,7 @@ export default function CreateProjectModal() {
       })
     }
     const nameIsValid = () => {
-        return name.length > 5 && name.length < 46 && (visibility == "private" || visibility == "public")
+        return name.length >= 5 && name.length < 46 && (visibility == "private" || visibility == "public")
     }
     React.useEffect(() => {
       console.log(visibility)
@@ -62,7 +62,7 @@ export default function CreateProjectModal() {
               <Text mb='1rem'>
                 What is the name of your new project?
               </Text>
-              <Input placeholder='Project Name' value={name} onChange={(e)=>setName(e.target.value)} />
+              <Input placeholder='Project Name(at least 5 characters)' value={name} onChange={(e)=>setName(e.target.value)} />
               <Text mb='1rem' marginTop="4">
                 What is the visibility of your project?
               </Text>
