@@ -9,8 +9,9 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import Pinecone
 from langchain.document_loaders import YoutubeLoader
 from langchain.document_loaders import WebBaseLoader
-from backend.src.loader.webPageLoader import WebPageLoader
+from backend.src.loader.WebPageLoader import WebPageLoader
 from backend.src.database.Documents import documentsDBService
+from backend.src.loader.SherherdYoutubeLoader import SherherdYoutubeLoader
 
 
 import tempfile
@@ -29,6 +30,10 @@ class BuilderService():
     
     def embedFile(self, file: UploadFile , pinecone  , embeddings , namespace):
         data = self.fileProcessing(file)
+        for i in range(len(data)):
+            data[i].metadata["source"] = file.filename
+    
+        
         vector = self.saveToPinecone("kbb", data, pinecone,embeddings,namespace)
         return vector
     
@@ -44,7 +49,7 @@ class BuilderService():
     
     def youtubeProcessing(self, url):
         try:
-            loader =YoutubeLoader.from_youtube_url(
+            loader =SherherdYoutubeLoader.from_youtube_url(
                         url, add_video_info=True
                     )
             data = loader.load()
@@ -67,6 +72,7 @@ class BuilderService():
         if extension in ["pdf", "docx", "txt"]:
             try:
                 with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+                    print(temp_file.name)
                     shutil.copyfileobj(file.file, temp_file)
                     if extension == "pdf":
                         loader = PyPDFLoader(temp_file.name)

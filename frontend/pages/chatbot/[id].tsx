@@ -1,17 +1,17 @@
 import Head from 'next/head'
 import React from 'react'
 import { Container, Flex, Text, Textarea, useToast } from '@chakra-ui/react'
-import { Popover, PopoverTrigger, Button, PopoverContent, PopoverArrow, PopoverCloseButton, PopoverHeader, PopoverBody} from '@chakra-ui/react'
-import { UnorderedList, ListItem} from '@chakra-ui/react'
+import { Popover, PopoverTrigger, Button, PopoverContent, PopoverArrow, PopoverCloseButton, PopoverHeader, PopoverBody } from '@chakra-ui/react'
+import { UnorderedList, ListItem } from '@chakra-ui/react'
 import { useAppContext } from '@/context/auth'
 import "@chatscope/chat-ui-kit-styles/dist/default/styles.min.css";
 import {
-  MainContainer,
-  ChatContainer,
-  MessageList,
-  Message,
-  MessageInput,
-  TypingIndicator,
+    MainContainer,
+    ChatContainer,
+    MessageList,
+    Message,
+    MessageInput,
+    TypingIndicator,
 } from "@chatscope/chat-ui-kit-react";
 import axios from 'axios'
 import { useRouter } from 'next/router';
@@ -26,11 +26,11 @@ type MessageType = {
 }
 
 export default function CreateProject() {
-    const {jwt, setJwtToken} = useAppContext()
+    const { jwt, setJwtToken } = useAppContext()
     const toast = useToast()
     const router = useRouter()
     const { id } = router.query;
-    const projectId = id || ''; 
+    const projectId = id || '';
     const [rolePrompt, setRolePrompt] = React.useState("")
     const [userQuestion, setUserQuestion] = React.useState("")
     const [loading, setLoading] = React.useState(false)
@@ -66,7 +66,7 @@ export default function CreateProject() {
                 sender: "Me",
                 direction: "outgoing",
                 position: "last"
-            },{
+            }, {
                 message: answer,
                 sentTime: "just now",
                 sender: "Chatbot",
@@ -75,7 +75,7 @@ export default function CreateProject() {
                 source: source
             }])
             setLoading(false)
-        } catch (error : any ) {
+        } catch (error: any) {
             console.error(error.response.data);
             toast({
                 title: 'Cannot receive a response',
@@ -106,7 +106,7 @@ export default function CreateProject() {
                 }
             }
             const getProjectDetails = async () => {
-                try{
+                try {
                     console.log(projectId)
                     const res = await axios.get(`/api/project/${query_id}`)
                     if(res.data.project.status !== "public"){
@@ -115,7 +115,7 @@ export default function CreateProject() {
                     setProject(res.data.project)
                     console.log(res.data.project)
                 }
-                catch(err){
+                catch (err) {
                     console.log(err)
                     router.push('/auth')
                 }
