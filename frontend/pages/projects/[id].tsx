@@ -157,9 +157,9 @@ export default function ProjectDetails() {
         } catch (error: any) {
             console.log(error)
             toast({
-                title: 'File upload failed',
-                description: error.message,
-                status: 'error',
+                title: 'In processing',
+                description:'The task is in processing , please refresh the page after 30 seconds !',
+                status: 'success',
                 duration: 5000,
                 isClosable: true,
             })
