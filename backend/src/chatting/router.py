@@ -27,6 +27,7 @@ async def upload(chatting: ChattingDTO, settings: Settings = Depends(get_setting
     
     result = chattingService.chat_with_namespace(settings, embeddings , chatting.projectId ,   chatting.text)
     return {
-        'answer':result,
+        'answer':result['text'],
+        'source':result['source']
     }
     

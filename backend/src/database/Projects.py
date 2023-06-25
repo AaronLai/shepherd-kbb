@@ -39,6 +39,9 @@ class Projects(Model):
 
     user_id_index = UserIdIndex()
 
+    def is_owner(self, user_id: str) -> bool:
+        return self.user_id == user_id
+
     def to_dict(self) -> dict[str, any]:
         return self.attribute_values
 
@@ -49,7 +52,10 @@ class ProjectDBService():
         pass
 
     def search_project_by_id(self, id: str):
-        result = Projects.get(id)
+        try:
+            result = Projects.get(id)
+        except Projects.DoesNotExist:
+            result = None
         return result
 
     def create_project(self, user_id, name, role, status):
