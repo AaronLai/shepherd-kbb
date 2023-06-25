@@ -57,7 +57,8 @@ export default function CreateProject() {
         try {
             const response = await axios.post('/api/chatting', {
                 projectId: projectId,
-                text: userQuestion
+                text: userQuestion,
+                history: chatHistory
             });
             const { answer, source } = response.data;
             setMessages([...messages, {
@@ -124,6 +125,16 @@ export default function CreateProject() {
             getProjectDetails()
         }
     }, [])
+
+    const chatHistory: Array<MessageHistory> = React.useMemo(() => {
+        return messages.map((message, index) => {
+            return {
+                sender: message.sender,
+                text: message.message,
+            }
+        })
+    }, [messages])
+
     return (
         <>
         <Head>
