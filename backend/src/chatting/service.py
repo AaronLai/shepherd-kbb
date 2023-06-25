@@ -26,5 +26,16 @@ class ChattingService():
         docSearch = PineconeConnector().getDocSearch(settings.PINECONE_API_KEY , settings.PINECONE_ENVIRONMENT ,embedding, namespace)
         qa = OpenAi(settings.OPENAI_API_KEY).getQA(docSearch)
         
-        return qa.run(text)
+        result = qa({"query": text}, return_only_outputs=True)
+        docsList =[]
+        for doc in result["source_documents"]:
+            docsList.append(doc.metadata["source"])
+        print(docsList)
+
+        answer = {
+            "text":result["result"],
+            "source":docsList
+        }
+        
+        return answer
     

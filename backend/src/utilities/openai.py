@@ -19,5 +19,6 @@ class OpenAi():
                 model_name="gpt-3.5-turbo-16k-0613"
             )
 
-        return RetrievalQA.from_chain_type(llm=llm, chain_type="stuff", retriever=docsearch.as_retriever(search_kwargs={"k": 10}))
+        return  RetrievalQA.from_chain_type(llm=llm, chain_type="stuff", retriever=docsearch.as_retriever(search_kwargs={"k": 10}), return_source_documents=True)
+
     
