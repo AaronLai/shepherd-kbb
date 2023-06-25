@@ -14,8 +14,8 @@ type ProjectType = {
     name: string;
     role: string;
     user_id: string;
-    chat_count: Number;
-    document_count: Number;
+    chat_count: number;
+    document_count: number;
     status: string;
     create_at: string;
 }
