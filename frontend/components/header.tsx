@@ -20,7 +20,7 @@ export default function Header(){
     return(
         <Flex alignItems='center' gap='2' paddingX="4" paddingY="2" position="fixed" top="0" width="full" zIndex="999" bgColor="white">
             <Link href="/">
-               <Box p='2' onClick={()=>router.push('/auth')}>
+               <Box>
                     <Text fontSize='xl' fontWeight={700}>852Shepherd</Text>
                 </Box> 
             </Link>

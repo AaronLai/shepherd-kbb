@@ -1,9 +1,11 @@
 import Head from 'next/head'
 import { Button, Center, Container, Text } from '@chakra-ui/react'
 import Link from 'next/link'
+import { useAppContext } from '@/context/auth'
 
 
 export default function Home() {
+  const {jwt} = useAppContext()
   return (
     <>
       <Head>
@@ -30,7 +32,7 @@ export default function Home() {
           At KnowledgeBot Builder, we understand the user&apos;s needs for a seamless experience. Simply upload your documents or provide URLs, and leave the rest to us. We will handle software engineering and prompt engineering.
         </Text>
         <Center marginTop="20">
-          <Link href="/auth">
+          <Link href={jwt?"/projects":"/auth"}>
             <Button bg='#55EF16' alignItems='center'>Try it out!</Button>
           </Link>
         </Center>
