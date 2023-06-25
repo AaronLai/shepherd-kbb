@@ -16,8 +16,10 @@ def register_user(name, email, password):
 
     salt = bcrypt.gensalt()
     hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt).decode('utf-8')
-    userDBService.create_user(name=name, email=email, password=hashed_password)
-    return None
+    user = userDBService.create_user(name=name, email=email, password=hashed_password)
+    jwt = create_jwt_token(user._id)
+
+    return (user, jwt)
 
 def user_login(email, password):
     query_search_result = userDBService.search_by_email(email)
