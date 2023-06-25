@@ -31,20 +31,20 @@ pinecone.init(
             )
 
 @router.post('/uploadFile')
-async def upload(file: UploadFile = File(...), project_id: str = Form(...), user: Users = Depends(verify_jwt_token), settings: Settings = Depends(get_settings)):
-    AuthService.is_project_owner(user._id, project_id)
+async def upload(file: UploadFile = File(...), projectId: str = Form(...), user: Users = Depends(verify_jwt_token), settings: Settings = Depends(get_settings)):
+    AuthService.is_project_owner(user._id, projectId)
 
     try:
         builderService = BuilderService(settings)
-        vector = builderService.embedFile(file, pinecone, embeddings, project_id)
+        vector = builderService.embedFile(file, pinecone, embeddings, projectId)
 
         documentsDBService.create_new_document(
-            project_id=project_id, 
+            project_id=projectId, 
             category='file', 
             topic=[], 
             file_name=file.filename
         )
-        projectDBService.increase_document_count(project_id, 1)
+        projectDBService.increase_document_count(projectId, 1)
 
         return {'status': 'success', 'message': 'File uploaded successfully!'}
     except Exception as e:
