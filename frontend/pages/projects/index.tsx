@@ -80,7 +80,6 @@ export default function ProjectList() {
                                     <Thead>
                                         <Tr>
                                             <Th>Name</Th>
-                                            <Th>Role</Th>
                                             <Th>Status</Th>
                                             <Th>Created At</Th>
                                             <Th>Update</Th>
@@ -92,7 +91,6 @@ export default function ProjectList() {
                                             return(
                                             <Tr key={item._id}>
                                                 <Td>{item.name}</Td>
-                                                <Td>{item.role}</Td>
                                                 <Td>{item.status}</Td>
                                                 <Td>{moment(item.create_at).format("lll")}</Td>
                                                 <Td><Link href={`/projects/${item._id}`}><Button variant="link"><ArrowForwardIcon w="6" h="6" /></Button></Link></Td>
