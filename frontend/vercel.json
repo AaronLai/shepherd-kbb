@@ -1,0 +1,9 @@
+{
+    "functions": {
+      "pages/api/file_upload.ts": {
+        "memory": 4096,
+        "maxDuration": 60
+      }
+    
+    }
+  }
