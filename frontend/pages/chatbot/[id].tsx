@@ -1,6 +1,8 @@
 import Head from 'next/head'
 import React from 'react'
 import { Container, Flex, Text, Textarea, useToast } from '@chakra-ui/react'
+import { Popover, PopoverTrigger, Button, PopoverContent, PopoverArrow, PopoverCloseButton, PopoverHeader, PopoverBody} from '@chakra-ui/react'
+import { UnorderedList, ListItem} from '@chakra-ui/react'
 import { useAppContext } from '@/context/auth'
 import "@chatscope/chat-ui-kit-styles/dist/default/styles.min.css";
 import {
@@ -19,7 +21,8 @@ type MessageType = {
     sentTime: string,
     sender: string,
     direction: any,
-    position: any
+    position: any,
+    source?: string[]
 }
 
 export default function CreateProject() {
@@ -55,7 +58,7 @@ export default function CreateProject() {
                 projectId: projectId,
                 text: userQuestion
             });
-            const { answer } = response.data;
+            const { answer, source } = response.data;
             setMessages([...messages, {
                 message: userQuestion,
                 sentTime: "just now",
@@ -67,7 +70,8 @@ export default function CreateProject() {
                 sentTime: "just now",
                 sender: "Chatbot",
                 direction: "incoming",
-                position: "last"
+                position: "last",
+                source: source
             }])
             setLoading(false)
         } catch (error : any ) {
@@ -137,9 +141,35 @@ export default function CreateProject() {
                                 {
                                     messages.map((message, index) => {
                                         return(
-                                            <Message key={index}
+                                            <Message 
+                                                key={index}
                                                 model={message}
-                                            />
+                                            >
+                                                {
+                                                    message.source && <Message.Footer>
+                                                    <Popover>
+                                                        <PopoverTrigger>
+                                                            <span>Source</span>
+                                                        </PopoverTrigger>
+                                                        <PopoverContent>
+                                                            <PopoverArrow />
+                                                            <PopoverCloseButton />
+                                                            <PopoverHeader>Source</PopoverHeader>
+                                                            <PopoverBody>
+                                                                <UnorderedList>
+                                                                    {
+                                                                        message.source.map((source, index) => {
+                                                                            return <ListItem>{source}</ListItem>
+                                                                        })
+                                                                    }
+                                                                </UnorderedList>
+                                                            </PopoverBody>
+                                                        </PopoverContent>
+                                                    </Popover>
+                                                </Message.Footer>
+                                                }
+                                                
+                                            </Message>
                                         )
                                     })
                                 }
