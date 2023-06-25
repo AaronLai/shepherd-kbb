@@ -27,9 +27,9 @@ export default function ProjectDetails() {
             const query_id = window.location.pathname.split('/')[window.location.pathname.split('/').length-1]
             const getProjectDetails = async () => {
                 try{
-                    console.log(projectId)
                     const res = await axios.get(`/api/project/${query_id}`)
                     setProject(res.data.project)
+                    console.log(res.data.project)
                 }
                 catch(err){
                     console.log(err)
@@ -45,11 +45,19 @@ export default function ProjectDetails() {
         try{
             setLoading(true)
             const response = await axios.post('/api/youtube_pass', {
-                url: youtubeLinkInput
+                url: youtubeLinkInput,
+                projectId: project._id,
+                token: jwt
             })
             setYoutubeLinks(response.data.url)
             setYoutubeLinkInput("")
             setLoading(false)
+            toast({
+                title: 'Upload YouTube link successfully!',
+                status: 'success',
+                duration: 5000,
+                isClosable: true,
+            })
         }
         catch(err: any){
             console.log(err)
@@ -67,12 +75,21 @@ export default function ProjectDetails() {
     const addWebLinks = async () => {
         try{
             setLoading(true)
+            console.log(jwt)
             const response = await axios.post('/api/webpage_read', {
-                url: webLinkInput
+                url: webLinkInput,
+                projectId: project._id,
+                token: jwt
             })
             setYoutubeLinks(response.data.url)
             setYoutubeLinkInput("")
             setLoading(false)
+            toast({
+                title: 'Upload web link successfully!',
+                status: 'success',
+                duration: 5000,
+                isClosable: true,
+            })
         }
         catch(err: any){
             console.log(err)
@@ -97,8 +114,7 @@ export default function ProjectDetails() {
         fileList != null ? setFiles(fileList[0]) : setFiles(null);
       };
     const uploadFile = async (file: any) => {
-
-
+        setLoading(true)
         try {
             let bodyFormData = new FormData();
             bodyFormData.append("file", file);
@@ -114,9 +130,10 @@ export default function ProjectDetails() {
 
               }});
             console.log(response.data)
+            setFiles(null)
+            setLoading(false)
             toast({
                 title: 'Upload file File uploaded successfully',
-                description: response.data.message,
                 status: 'success',
                 duration: 5000,
                 isClosable: true,
@@ -156,12 +173,6 @@ export default function ProjectDetails() {
         }
         setLoading(false)
     }
-    //protected page
-    const getLocalStorageItem = (key: string) => {
-        if (typeof window !== "undefined"){
-            return window.localStorage.getItem(key)
-        }
-    };
     return (
         <>
         <Head>
@@ -180,7 +191,7 @@ export default function ProjectDetails() {
                         <Text fontSize="lg" marginBottom="2" fontWeight="bold">Input Section</Text>
                         <Text fontSize="md" marginTop="2">Document Count: {project!=null?project.document_count:0}</Text>
                         <Text fontSize="md" marginTop="2">Please upload files here: (accepted file types: .pdf, .doc, .docx)</Text>
-                        <Button onClick={()=>selectFile()} width="fit-content" border="2px">
+                        <Button onClick={()=>selectFile()} width="fit-content" border="2px" isLoading={loading}>
                             Select Files
                         </Button>
                         <Input
@@ -219,14 +230,14 @@ export default function ProjectDetails() {
                         <InputGroup>
                             <Input placeholder='Web URL:' value={webLinkInput} onChange={(e)=>setWebLinkInput(e.target.value)} />
                             <InputRightElement>
-                                <Button onClick={()=>addWebLinks()} variant="link" isDisabled={webLinkInput.length==0}><AddIcon color='green.500' /></Button>
+                                <Button onClick={()=>addWebLinks()} variant="link" isDisabled={webLinkInput.length==0} isLoading={loading}><AddIcon color='green.500' /></Button>
                             </InputRightElement>
                         </InputGroup>
                         <Text fontSize="md" marginTop="2">Please enter YouTube Links here:</Text>
                         <InputGroup>
                             <Input placeholder='Youtube Link:' value={youtubeLinkInput} onChange={(e)=>setYoutubeLinkInput(e.target.value)} />
                             <InputRightElement>
-                                <Button onClick={()=>addYoutubeLink()} variant="link" isDisabled={youtubeLinkInput.length==0}><AddIcon color='green.500' /></Button>
+                                <Button onClick={()=>addYoutubeLink()} variant="link" isDisabled={youtubeLinkInput.length==0} isLoading={loading}><AddIcon color='green.500' /></Button>
                             </InputRightElement>
                         </InputGroup>
                     </Card>
