@@ -93,11 +93,10 @@ export default function Auth() {
     return signupUser.email.length > 5 && signupUser.username.length > 5 && signupUser.password.length > 5 && signupUser.password === signupUser.password2 && containsNumbersAndSymbols(signupUser.password)
   }
   React.useEffect(() => {
-    console.log(signupUser)
-  }, [signupUser])
-  React.useEffect(() => {
-    console.log(loginUser)
-  }, [loginUser])
+    if(typeof window !== "undefined" && localStorage.getItem("jwt")!== null){
+      router.push('/projects')
+    }
+  }, [])
 
   return (
     <>
