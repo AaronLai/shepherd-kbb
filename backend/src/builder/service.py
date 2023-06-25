@@ -10,7 +10,7 @@ from langchain.vectorstores import Pinecone
 from langchain.document_loaders import YoutubeLoader
 from langchain.document_loaders import WebBaseLoader
 from backend.src.loader.webPageLoader import WebPageLoader
-
+from backend.src.database.Documents import documentsDBService
 
 
 import tempfile
@@ -23,7 +23,7 @@ class BuilderService():
     def __init__(self, settings: Settings):
         self.settings = settings
 
-
+ 
     def getPinecone(settings: Settings):
         return PineconeConnector().getPinecone(settings.PINECONE_API_KEY, settings.PINECONE_ENVIRONMENT)
     
@@ -38,7 +38,7 @@ class BuilderService():
         return vector
     
     def embedWeb(self, url , pinecone  , embeddings , namespace):
-        data = self.webpageProcessing(url)
+        data =  self.webpageProcessing(url)
         vector = self.saveToPinecone("kbb", data, pinecone,embeddings,namespace)
         return vector
     
@@ -113,10 +113,17 @@ class BuilderService():
             docsearch = Pinecone.from_documents(docs, embeddings, index_name=index_name , namespace=namespace)
         else:
             # if exists, add texts
-            print("index exists")
+
             docsearch = Pinecone.from_existing_index(index_name=index_name, embedding=embeddings ,  namespace=namespace).add_documents(docs)
     
         # for i in range(len(data)):
         #     if data[i] != "":
         #         pinecone.upsert_embeddings("conversation", embeddings.embed(data[i]), data[i])
-        return docsearch
+        return data
+    
+    def saveToDocumentTable(self,project_id, docs , type, url):
+        content =""
+        for i in range(len(docs)):
+            content += docs[i].page_content
+        print(content)
+        # print(content)

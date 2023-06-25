@@ -65,6 +65,8 @@ def is_project_owner(user_id: str, project_id: str):
     project = projectDBService.search_project_by_id(project_id)
     if(not project):
         raise HTTPException(status_code=404, detail="Project not found")
+    
+    user = userDBService.get_by_id(user_id)
 
     if(project.user_id != user._id):
         raise HTTPException(status_code=401, detail="You don't have access to this project")
