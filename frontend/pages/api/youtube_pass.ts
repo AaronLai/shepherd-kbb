@@ -8,12 +8,16 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
   console.log(`${publicRuntimeConfig.API_ENDPOINT}/builder/passYoutube`,req.body);
 
   if (req.method === 'POST') {
-    const { url } = req.body as { url: string };
+    const { url, projectId, token } = req.body as { url: string, projectId: string, token: string };
 
     try {
 
       const response = await axios.post(`${publicRuntimeConfig.API_ENDPOINT}/builder/passYoutube`, {
-        url
+        url, projectId
+      },{
+        headers: {
+          token: token
+        }
       });
 
       const { type } = response.data;
