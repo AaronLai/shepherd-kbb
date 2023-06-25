@@ -16,9 +16,9 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
         projectId, userId, nameSpace, text
       });
 
-      const { answer } = response.data;
+      const { answer, source } = response.data;
       console.log(answer);
-      res.status(200).json({ answer });
+      res.status(200).json({ answer, source });
     } catch (error : any) {
       res.status(error.response.status).json({ error: error.message });
     }
