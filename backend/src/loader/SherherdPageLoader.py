@@ -13,7 +13,7 @@ def _build_metadata(soup: Any, url: str) -> dict:
         metadata["language"] = html.get("lang", None)
     return metadata
 
-class WebPageLoader(WebBaseLoader):
+class SherherdPageLoader(WebBaseLoader):
     def load(self) -> List[Document]:
         """Load text from the url(s) in web_path."""
         docs = []

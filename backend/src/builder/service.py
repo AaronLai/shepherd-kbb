@@ -9,7 +9,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import Pinecone
 from langchain.document_loaders import YoutubeLoader
 from langchain.document_loaders import WebBaseLoader
-from backend.src.loader.WebPageLoader import WebPageLoader
+from backend.src.loader.SherherdPageLoader import SherherdPageLoader
 from backend.src.database.Documents import documentsDBService
 from backend.src.loader.SherherdYoutubeLoader import SherherdYoutubeLoader
 
@@ -59,7 +59,7 @@ class BuilderService():
         
     def webpageProcessing(self, url):
         try:
-            loader = WebPageLoader(url)
+            loader = SherherdPageLoader(url)
 
             data = loader.load()
             return data
