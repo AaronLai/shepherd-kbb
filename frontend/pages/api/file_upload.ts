@@ -42,7 +42,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
                     (Array.isArray(files.file) ? files.file[0].originalFilename : files.file.originalFilename) || 'default_filename'
                 );
 
-                formData.append('project_id',fields.projectId[0]);
+                formData.append('projectId',fields.projectId[0]);
 
                 try {
                     const response = await axios.post(`${publicRuntimeConfig.API_ENDPOINT}/builder/uploadFile`, formData, {
