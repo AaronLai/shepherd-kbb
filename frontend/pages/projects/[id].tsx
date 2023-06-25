@@ -261,6 +261,22 @@ export default function ProjectDetails() {
                                 <Button onClick={()=>addWebLinks()} variant="link" isDisabled={webLinkInput.length==0} isLoading={loading && loadingStep == "web"}><AddIcon color='green.500' /></Button>
                             </InputRightElement>
                         </InputGroup>
+                        {
+                            documents.filter((item: any) => item.category == "web").length
+                            ?<Text fontSize="md" marginTop="2">Previously uploaded web URLs:</Text>
+                            :null
+                        }
+                        {
+                            documents.filter((item: any) => item.category == "web").map((fileItem: any) => {
+                                return (
+                                    <Link href={fileItem.file_name} key={fileItem._id} target="_blank">
+                                        <Flex gap="1" marginLeft="2">
+                                            <Text marginY="auto" textDecoration="underline">{fileItem.file_name}</Text>
+                                        </Flex>
+                                    </Link>
+                                )
+                                })
+                        }
                         <Text fontSize="md" marginTop="2">Please enter YouTube link here:</Text>
                         <InputGroup>
                             <Input placeholder='Youtube Link:' value={youtubeLinkInput} onChange={(e)=>setYoutubeLinkInput(e.target.value)} />
@@ -278,7 +294,7 @@ export default function ProjectDetails() {
                                 return (
                                     <Link href={fileItem.file_name} key={fileItem._id} target="_blank">
                                         <Flex gap="1" marginLeft="2">
-                                            <Text noOfLines={1} marginY="auto" textDecoration="underline">{fileItem.file_name}</Text>
+                                            <Text marginY="auto" textDecoration="underline">{fileItem.file_name}</Text>
                                         </Flex>
                                     </Link>
                                 )
