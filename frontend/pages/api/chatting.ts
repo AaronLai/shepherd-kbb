@@ -8,12 +8,11 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
   console.log(`${publicRuntimeConfig.API_ENDPOINT}/chatting`,req.body);
 
   if (req.method === 'POST') {
-    const { projectId, userId, nameSpace, text } = req.body as { projectId: string, userId: string, nameSpace: string, text: string };
+    const { projectId, userId, nameSpace, text, history } = req.body as { projectId: string, userId: string, nameSpace: string, text: string, history: Array<MessageHistory> };
 
     try {
-
       const response = await axios.post(`${publicRuntimeConfig.API_ENDPOINT}/chatting`, {
-        projectId, userId, nameSpace, text
+        projectId, userId, nameSpace, text, history
       });
 
       const { answer, source } = response.data;
