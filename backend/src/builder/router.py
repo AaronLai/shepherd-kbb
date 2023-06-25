@@ -78,8 +78,15 @@ async def readWebpage(background_tasks: BackgroundTasks , data: WebpageDTO, user
         builderService = BuilderService(settings)
         docs = builderService.embedWeb(data.url, pinecone, embeddings, data.projectId)
 
-        async_job = partial(run_async_job, settings , docs,data.projectId,'webpage' , data.url)  # Create a partial function with 'vector' as an argument
-        background_tasks.add_task(async_job)
+        documentsDBService.create_new_document(
+            project_id=data.projectId, 
+            category='web', 
+            topic=[], 
+            file_name=data.url
+        )
+        projectDBService.increase_document_count(data.projectId, 1)
+        # async_job = partial(run_async_job, settings , docs,data.projectId,'webpage' , data.url)  # Create a partial function with 'vector' as an argument
+        # background_tasks.add_task(async_job)
 
 
         return {'status': 'success', 'message': 'Webpage read successfully!'}

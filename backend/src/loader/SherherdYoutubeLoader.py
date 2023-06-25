@@ -25,7 +25,7 @@ class SherherdYoutubeLoader(YoutubeLoader):
             title = video_info["title"]
             id = self.video_id
             print(title)
-            metadata = {"source": f"Youtube - {title} - {id}"}
+            metadata = {"source": f"Youtube - {title}"}
 
             # metadata.update(video_info)
             print(metadata)
