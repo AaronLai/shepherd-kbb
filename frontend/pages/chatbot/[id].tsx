@@ -159,7 +159,7 @@ export default function CreateProject() {
                                                                 <UnorderedList>
                                                                     {
                                                                         message.source.map((source, index) => {
-                                                                            return <ListItem>{source}</ListItem>
+                                                                            return <ListItem key={index}>{source}</ListItem>
                                                                         })
                                                                     }
                                                                 </UnorderedList>
