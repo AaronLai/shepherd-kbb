@@ -24,8 +24,7 @@ pinecone.init(
 @router.post('/')
 async def upload(chatting: ChattingDTO, settings: Settings = Depends(get_settings)):
     chattingService = ChattingService(settings)
-    
-    result = chattingService.chat_with_namespace(settings, embeddings , chatting.projectId ,   chatting.text)
+    result = chattingService.chat_with_namespace(settings, embeddings , chatting.projectId ,   chatting.text , chatting.history)
     return {
         'answer':result['text'],
         'source':result['source']
