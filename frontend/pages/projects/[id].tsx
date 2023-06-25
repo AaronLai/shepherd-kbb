@@ -1,12 +1,13 @@
 import Head from 'next/head'
 import React from 'react'
-import { Button, Card, Container, Flex, Input, InputGroup, InputRightElement, Spacer, Tab, TabList, TabPanel, TabPanels, Table, TableContainer, Tabs, Tbody, Td, Text, Textarea, Th, Thead, Tr, useToast } from '@chakra-ui/react'
+import { Button, Card, Container, Flex, Input, InputGroup, InputRightElement, Spacer, Text, Textarea, useToast } from '@chakra-ui/react'
 import { useAppContext } from '@/context/auth'
-import { AddIcon, CloseIcon } from '@chakra-ui/icons'
+import { AddIcon, CloseIcon, CopyIcon } from '@chakra-ui/icons'
 import axios from 'axios'
 import { useRouter } from 'next/router'
-import { headers } from 'next/dist/client/components/headers'
 import getConfig from 'next/config';
+import moment from 'moment'
+import Link from 'next/link'
 const { publicRuntimeConfig } = getConfig();
 export default function ProjectDetails() {
     const {jwt} = useAppContext()
@@ -22,6 +23,7 @@ export default function ProjectDetails() {
     const [response, setResponse] = React.useState("")
     const [project, setProject] = React.useState<any>(null)
     const [loadingStep, setLoadingStep] = React.useState("")
+    const [documents, setDocuments] = React.useState<any>([])
     React.useEffect(() => {
         if(typeof window !== "undefined" && localStorage.getItem("jwt")!== null){
             const query_id = window.location.pathname.split('/')[window.location.pathname.split('/').length-1]
@@ -30,6 +32,18 @@ export default function ProjectDetails() {
                     const res = await axios.get(`/api/project/${query_id}`)
                     setProject(res.data.project)
                     console.log(res.data.project)
+                    try {
+                        const docResponse = await axios.get(`/api/project/${query_id}/documents`, {
+                            headers: {
+                                'token': localStorage.getItem("jwt")
+                            }
+                        })
+                        console.log(docResponse.data.documents)
+                        setDocuments(docResponse.data.documents)
+                    }
+                    catch(err){
+                        console.log(err)
+                    }
                 }
                 catch(err){
                     console.log(err)
@@ -192,7 +206,7 @@ export default function ProjectDetails() {
                     <Card padding="4" gap="2" bgColor="gray.100" letterSpacing="0">
                         <Text fontSize="lg" marginBottom="2" fontWeight="bold">Input Section</Text>
                         <Text fontSize="md" marginTop="2">Document Count: {project!=null?project.document_count:0}</Text>
-                        <Text fontSize="md" marginTop="2">Please upload files here: (accepted file types: .pdf, .doc, .docx)</Text>
+                        <Text fontSize="md" marginTop="2">Please upload file here: (accepted file types: .pdf, .doc, .docx)</Text>
                         <Button onClick={()=>selectFile()} width="fit-content" border="2px" isLoading={loading && loadingStep == "file"}>
                             Select Files
                         </Button>
@@ -228,20 +242,48 @@ export default function ProjectDetails() {
                             )
                             :null
                         }
-                        <Text fontSize="md" marginTop="2">Please enter web URLs here:</Text>
+                        {
+                            documents.filter((item: any) => item.category == "file").length
+                            ?<Text fontSize="md" marginTop="2">Previously uploaded files:</Text>
+                            :null
+                        }
+                        {
+                            documents.filter((item: any) => item.category == "file").map((fileItem: any) => {
+                                return (
+                                    <Flex key={fileItem._id} gap="1" marginLeft="2"  noOfLines={1}>{fileItem.file_name}</Flex>
+                                )
+                                })
+                        }
+                        <Text fontSize="md" marginTop="2">Please enter web URL here:</Text>
                         <InputGroup>
                             <Input placeholder='Web URL:' value={webLinkInput} onChange={(e)=>setWebLinkInput(e.target.value)} />
                             <InputRightElement>
                                 <Button onClick={()=>addWebLinks()} variant="link" isDisabled={webLinkInput.length==0} isLoading={loading && loadingStep == "web"}><AddIcon color='green.500' /></Button>
                             </InputRightElement>
                         </InputGroup>
-                        <Text fontSize="md" marginTop="2">Please enter YouTube Links here:</Text>
+                        <Text fontSize="md" marginTop="2">Please enter YouTube link here:</Text>
                         <InputGroup>
                             <Input placeholder='Youtube Link:' value={youtubeLinkInput} onChange={(e)=>setYoutubeLinkInput(e.target.value)} />
                             <InputRightElement>
                                 <Button onClick={()=>addYoutubeLink()} variant="link" isDisabled={youtubeLinkInput.length==0} isLoading={loading && loadingStep == "youtube"}><AddIcon color='green.500' /></Button>
                             </InputRightElement>
                         </InputGroup>
+                        {
+                            documents.filter((item: any) => item.category == "youtube").length
+                            ?<Text fontSize="md" marginTop="2">Previously uploaded YouTube links:</Text>
+                            :null
+                        }
+                        {
+                            documents.filter((item: any) => item.category == "youtube").map((fileItem: any) => {
+                                return (
+                                    <Link href={fileItem.file_name} key={fileItem._id} target="_blank">
+                                        <Flex gap="1" marginLeft="2">
+                                            <Text noOfLines={1} marginY="auto" textDecoration="underline">{fileItem.file_name}</Text>
+                                        </Flex>
+                                    </Link>
+                                )
+                                })
+                        }
                     </Card>
                     
                     <Card padding="4" gap="2" bgColor="gray.100" letterSpacing="0" marginTop="4">
