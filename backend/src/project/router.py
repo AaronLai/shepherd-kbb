@@ -5,6 +5,7 @@ from backend.config import Settings, get_settings
 from backend.src.auth.dependency import verify_jwt_token
 from backend.src.project.model import CreateProjectDTO
 import backend.src.project.service as ProjectService
+import backend.src.auth.service as AuthService
 
 from backend.src.database.Users import Users
 
@@ -22,6 +23,15 @@ async def get_project_info(project_id: str):
     project_info = ProjectService.get_project_by_id(project_id)
     return {
         'project': project_info.to_dict()
+    }
+
+@router.get('/{project_id}/documents')
+async def get_project_documents(project_id: str, user: Annotated[Users, Depends(verify_jwt_token)]):
+    AuthService.is_project_owner(user._id, project_id=project_id)
+
+    documents_list = ProjectService.get_project_documents(project_id)
+    return {
+        'documents': [i.to_dict() for i in documents_list]
     }
 
 @router.post('')
