@@ -21,7 +21,7 @@ type ProjectType = {
 }
 
 export default function ProjectList() {
-    const {jwt, setJwtToken} = useAppContext()
+    const {jwt} = useAppContext()
     const [projects, setProjects] = React.useState<ProjectType[]>([])
     const router = useRouter()
     const toast = useToast()
@@ -35,8 +35,6 @@ export default function ProjectList() {
                         }
                     })
                     setProjects(response.data.projects)
-                    console.log(response.data)
-                    setJwtToken(jwt)
                 } catch (error : any ) {
                     console.error(error);
                     toast({
@@ -54,15 +52,6 @@ export default function ProjectList() {
             router.push('/auth')
         }
     }, [])
-    //protected page
-    const getLocalStorageItem = (key: string) => {
-        if (typeof window !== undefined){
-        return window.localStorage.getItem(key)
-        }
-    };
-    React.useEffect(() => {
-        setJwtToken(getLocalStorageItem("jwt"));
-    }, []);
     return (
         <>
         <Head>
@@ -72,7 +61,7 @@ export default function ProjectList() {
             <link rel="icon" href="/favicon.ico" />
         </Head>
         {
-            jwt === null? <></>:(
+            jwt !== ""? (
                 <main>
                     <Container maxWidth="100ch" marginY="20">
                     <Text fontSize="2xl" textAlign='center' fontWeight='bold' marginBottom="12">My Projects</Text>
@@ -129,6 +118,7 @@ export default function ProjectList() {
                     </Container>
                 </main>
             )
+            :<></>
         }
     </>
     )

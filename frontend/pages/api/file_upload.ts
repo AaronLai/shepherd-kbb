@@ -42,17 +42,21 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
                     (Array.isArray(files.file) ? files.file[0].originalFilename : files.file.originalFilename) || 'default_filename'
                 );
 
-                formData.append('projectId',fields.projectId[0]);
+                formData.append('project_id',fields.projectId[0]);
 
-                const response = await axios.post(`${publicRuntimeConfig.API_ENDPOINT}/builder/uploadFile`, formData, {
-                    headers: {
-                        ...formData.getHeaders(),
-                        'token': req.headers["token"]
-                    },
-                });
-
-                const { status, message } = response.data;
-                res.status(200).json({ status, message });
+                try {
+                    const response = await axios.post(`${publicRuntimeConfig.API_ENDPOINT}/builder/uploadFile`, formData, {
+                        headers: {
+                            ...formData.getHeaders(),
+                            'token': req.headers["token"]
+                        },
+                    });
+                    const { status, message } = response.data;
+                    res.status(200).json({ status, message });
+                }
+                catch (error: any) {
+                    res.status(error.response?.status || 500).json({ error: error.message });
+                }
             });
         } catch (error: any) {
 
