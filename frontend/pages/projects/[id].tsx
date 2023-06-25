@@ -15,13 +15,13 @@ export default function ProjectDetails() {
     const projectId = id || ''; 
     const toast = useToast()
     const [files, setFiles] = React.useState<File | null>(null)
-    const [youtubeLinks, setYoutubeLinks] = React.useState<string>("")
     const [youtubeLinkInput, setYoutubeLinkInput] = React.useState('')
     const [webLinkInput, setWebLinkInput] = React.useState('')
     const [loading, setLoading] = React.useState(false)
     const [userQuestion, setUserQuestion] = React.useState("")
     const [response, setResponse] = React.useState("")
     const [project, setProject] = React.useState<any>(null)
+    const [loadingStep, setLoadingStep] = React.useState("")
     React.useEffect(() => {
         if(typeof window !== "undefined" && localStorage.getItem("jwt")!== null){
             const query_id = window.location.pathname.split('/')[window.location.pathname.split('/').length-1]
@@ -44,12 +44,12 @@ export default function ProjectDetails() {
     const addYoutubeLink = async () => {
         try{
             setLoading(true)
+            setLoadingStep("youtube")
             const response = await axios.post('/api/youtube_pass', {
                 url: youtubeLinkInput,
                 projectId: project._id,
                 token: jwt
             })
-            setYoutubeLinks(response.data.url)
             setYoutubeLinkInput("")
             setLoading(false)
             toast({
@@ -75,17 +75,17 @@ export default function ProjectDetails() {
     const addWebLinks = async () => {
         try{
             setLoading(true)
+            setLoadingStep("web")
             console.log(jwt)
             const response = await axios.post('/api/webpage_read', {
                 url: webLinkInput,
                 projectId: project._id,
                 token: jwt
             })
-            setYoutubeLinks(response.data.url)
             setYoutubeLinkInput("")
             setLoading(false)
             toast({
-                title: 'Upload web link successfully!',
+                title: 'Uploaded web link successfully!',
                 status: 'success',
                 duration: 5000,
                 isClosable: true,
@@ -94,7 +94,7 @@ export default function ProjectDetails() {
         catch(err: any){
             console.log(err)
             toast({
-                title: 'Upload webpage link failed',
+                title: 'Webpage upload failed',
                 description: err.message,
                 status: 'error',
                 duration: 5000,
@@ -115,6 +115,7 @@ export default function ProjectDetails() {
       };
     const uploadFile = async (file: any) => {
         setLoading(true)
+        setLoadingStep("file")
         try {
             let bodyFormData = new FormData();
             bodyFormData.append("file", file);
@@ -133,7 +134,7 @@ export default function ProjectDetails() {
             setFiles(null)
             setLoading(false)
             toast({
-                title: 'Upload file File uploaded successfully',
+                title: 'File uploaded successfully',
                 status: 'success',
                 duration: 5000,
                 isClosable: true,
@@ -142,7 +143,7 @@ export default function ProjectDetails() {
         } catch (error: any) {
             console.log(error)
             toast({
-                title: 'Upload file failed',
+                title: 'File upload failed',
                 description: error.message,
                 status: 'error',
                 duration: 5000,
@@ -153,6 +154,7 @@ export default function ProjectDetails() {
     }
     const submitChat = async () => {
         setLoading(true)
+        setLoadingStep("chat")
         try {
             const response = await axios.post('/api/chatting', {
                 projectId: projectId,
@@ -191,7 +193,7 @@ export default function ProjectDetails() {
                         <Text fontSize="lg" marginBottom="2" fontWeight="bold">Input Section</Text>
                         <Text fontSize="md" marginTop="2">Document Count: {project!=null?project.document_count:0}</Text>
                         <Text fontSize="md" marginTop="2">Please upload files here: (accepted file types: .pdf, .doc, .docx)</Text>
-                        <Button onClick={()=>selectFile()} width="fit-content" border="2px" isLoading={loading}>
+                        <Button onClick={()=>selectFile()} width="fit-content" border="2px" isLoading={loading && loadingStep == "file"}>
                             Select Files
                         </Button>
                         <Input
@@ -230,14 +232,14 @@ export default function ProjectDetails() {
                         <InputGroup>
                             <Input placeholder='Web URL:' value={webLinkInput} onChange={(e)=>setWebLinkInput(e.target.value)} />
                             <InputRightElement>
-                                <Button onClick={()=>addWebLinks()} variant="link" isDisabled={webLinkInput.length==0} isLoading={loading}><AddIcon color='green.500' /></Button>
+                                <Button onClick={()=>addWebLinks()} variant="link" isDisabled={webLinkInput.length==0} isLoading={loading && loadingStep == "web"}><AddIcon color='green.500' /></Button>
                             </InputRightElement>
                         </InputGroup>
                         <Text fontSize="md" marginTop="2">Please enter YouTube Links here:</Text>
                         <InputGroup>
                             <Input placeholder='Youtube Link:' value={youtubeLinkInput} onChange={(e)=>setYoutubeLinkInput(e.target.value)} />
                             <InputRightElement>
-                                <Button onClick={()=>addYoutubeLink()} variant="link" isDisabled={youtubeLinkInput.length==0} isLoading={loading}><AddIcon color='green.500' /></Button>
+                                <Button onClick={()=>addYoutubeLink()} variant="link" isDisabled={youtubeLinkInput.length==0} isLoading={loading && loadingStep == "youtube"}><AddIcon color='green.500' /></Button>
                             </InputRightElement>
                         </InputGroup>
                     </Card>
@@ -247,7 +249,7 @@ export default function ProjectDetails() {
                         <Textarea placeholder='Enter a prompt to ask questions!' value={userQuestion} onChange={(e)=>setUserQuestion(e.target.value)} />
                         <Flex marginTop="2">
                             <Spacer />
-                            <Button bgColor="#91FF64" border="2px" onClick={()=>submitChat()} isLoading={loading}>Chat!</Button>
+                            <Button bgColor="#91FF64" border="2px" onClick={()=>submitChat()} isLoading={loading && loadingStep == "chat"}>Chat!</Button>
                         </Flex>
                         {
                             response !== ""? (
