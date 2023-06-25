@@ -12,6 +12,11 @@ export default function Header(){
         localStorage.removeItem("jwt")
         router.push('/auth')
     }
+    React.useEffect(() => {
+        if(typeof window !== "undefined"){
+            setJwtToken(localStorage.getItem("jwt"))
+        }
+    }, [])
     return(
         <Flex alignItems='center' gap='2' paddingX="4" paddingY="2" position="fixed" top="0" width="full" zIndex="999" bgColor="white">
             <Link href="/">
@@ -27,23 +32,23 @@ export default function Header(){
             <Spacer />
             <Menu>
                 <MenuButton>
-                    <Avatar src='https://bit.ly/broken-link' width="10" height="10" />
+                    <Avatar src='https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png' width="10" height="10" />
                 </MenuButton>
                 <MenuList gap="2">
                     {/* <MenuItem _hover={{bgColor: "gray.200"}} borderBottom="1px" borderColor="gray.200" paddingY="3">Your Profile</MenuItem> */}
                         {
                             jwt? (
-                                <Link href='/auth'>
-                                    <MenuItem _hover={{bgColor: "gray.200"}} paddingY="3">
-                                            Sign Up/Login
-                                    </MenuItem>
-                                </Link>
-                            ) : (
                                 <>
                                 <MenuItem _hover={{bgColor: "gray.200"}} paddingY="3" onClick={()=>logout()}>
                                     <Text>Logout</Text>
                                 </MenuItem>
                                 </>
+                            ) : (
+                                <Link href='/auth'>
+                                    <MenuItem _hover={{bgColor: "gray.200"}} paddingY="3">
+                                            Sign Up/Login
+                                    </MenuItem>
+                                </Link>
                             )
                         }
                 </MenuList>
