@@ -27,6 +27,7 @@ class Documents(Model):
     category = UnicodeAttribute()
     topic = ListAttribute()
     file_name = UnicodeAttribute()
+    url = UnicodeAttribute(null=True)
     create_at = UTCDateTimeAttribute(default_for_new=get_current_time_utc)
 
     def to_dict(self) -> dict[str, any]:
@@ -38,7 +39,7 @@ class DocumentsDBService():
             Documents.create_table(read_capacity_units=10, write_capacity_units=10, wait=True)
         pass
 
-    def create_new_document(self, project_id: str, category: str, topic: list[str], file_name: str):
+    def create_new_document(self, project_id: str, category: str, topic: list[str], file_name: str, url: str | None = None):
         new_id = str(uuid.uuid4()).replace('-', '')
 
         new_document = Documents(
@@ -46,7 +47,8 @@ class DocumentsDBService():
             project_id=project_id,
             category=category,
             topic=topic,
-            file_name=file_name
+            file_name=file_name,
+            url=url
         )
         new_document.save()
         return new_document
