@@ -76,9 +76,9 @@ export default function ProjectDetails() {
         catch(err: any){
             console.log(err)
             toast({
-                title: 'Upload YouTube link failed',
-                description: err.message,
-                status: 'error',
+                title: 'In processing',
+                description:'The task is in processing , please refresh the page after 30 seconds !',
+                status: 'success',
                 duration: 5000,
                 isClosable: true,
             })
@@ -108,9 +108,9 @@ export default function ProjectDetails() {
         catch(err: any){
             console.log(err)
             toast({
-                title: 'Webpage upload failed',
-                description: err.message,
-                status: 'error',
+                title: 'In processing',
+                description:'The task is in processing , please refresh the page after 30 seconds !',
+                status: 'success',
                 duration: 5000,
                 isClosable: true,
             })
@@ -180,9 +180,9 @@ export default function ProjectDetails() {
         } catch (error : any ) {
             console.error(error.response.data);
             toast({
-                title: 'Cannot receive response',
-                description: "Please check your network connection and prompt",
-                status: 'error',
+          title: 'In processing',
+                description:'The task is in processing , please refresh the page after 30 seconds !',
+                status: 'success',
                 duration: 5000,
                 isClosable: true,
             })
