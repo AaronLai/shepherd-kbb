@@ -64,10 +64,6 @@ export default function CreateProjectModal() {
               </Text>
               <Input placeholder='Project Name' value={name} onChange={(e)=>setName(e.target.value)} />
               <Text mb='1rem' marginTop="4">
-                What is your role?
-              </Text>
-              <Input placeholder='Role' value={role} onChange={(e)=>setRole(e.target.value)} />
-              <Text mb='1rem' marginTop="4">
                 What is the visibility of your project?
               </Text>
               <Select placeholder='Select visibility' onChange={(e)=>setVisibility(e.target.value)}>

@@ -90,7 +90,7 @@ export default function Auth() {
     return false;
   }
   const isValid = () => {
-    return signupUser.email.length > 5 && signupUser.username.length > 5 && signupUser.password.length > 5 && signupUser.password === signupUser.password2 && containsNumbersAndSymbols(signupUser.password)
+    return signupUser.email.length > 5 && signupUser.username.length >= 5 && signupUser.password.length > 5 && signupUser.password === signupUser.password2 && containsNumbersAndSymbols(signupUser.password)
   }
   React.useEffect(() => {
     if(typeof window !== "undefined" && localStorage.getItem("jwt")!== null){
@@ -127,8 +127,8 @@ export default function Auth() {
                 </TabPanel>
                 <TabPanel>
                 <Input placeholder='Enter your email' value={signupUser.email} onChange={handleSignupInput} id="email" marginY="2" />
-                <Input placeholder='Enter your username' value={signupUser.username} onChange={handleSignupInput} id="username" marginY="2" />
-                <Input placeholder='Enter your password' type="password" value={signupUser.password} onChange={handleSignupInput} id="password" marginY="2" />
+                <Input placeholder='Enter your username(at least 5 characters)' value={signupUser.username} onChange={handleSignupInput} id="username" marginY="2" />
+                <Input placeholder='Enter your password (at least 5 characters and contain one number and symbol)' type="password" value={signupUser.password} onChange={handleSignupInput} id="password" marginY="2" />
                 <Input placeholder='Re-enter your password' type="password" value={signupUser.password2} onChange={handleSignupInput} id="password2" marginY="2" />
                 <Flex>
                   <Spacer />
@@ -143,3 +143,4 @@ export default function Auth() {
     </>
   )
 }
+

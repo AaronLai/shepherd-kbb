@@ -148,10 +148,9 @@ export default function CreateProject() {
                 <main>
                     <Container marginY="20">
                         <Text fontSize="2xl" textAlign='center' fontWeight='bold' marginBottom="8">{project!=null?project.name:"project_name"}</Text>
-                        <Text fontSize="xl">Your Role Prompt</Text>
-                        <Textarea placeholder="Role Prompt" marginTop="2" marginBottom="4" value={rolePrompt} onChange={(e)=>setRolePrompt(e.target.value)} />
+                    
                         <Text fontSize="xl">Chatbox</Text>
-                        <div style={{ position: "relative", height: "500px" }}>
+                        <div style={{ position: "relative", height: "600px" }}>
                             <MainContainer>
                                 <ChatContainer>
                                 <MessageList style={{padding: "12px 0"}}>
