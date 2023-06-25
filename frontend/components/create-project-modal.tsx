@@ -2,6 +2,7 @@ import { AddIcon } from "@chakra-ui/icons"
 import { useDisclosure, Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, Text, Input, Select, useToast } from "@chakra-ui/react"
 import React from "react"
 import axios from "axios"
+import { ErrorCallback } from "typescript"
 
 export default function CreateProjectModal() {
     const { isOpen, onOpen, onClose } = useDisclosure()
@@ -31,11 +32,11 @@ export default function CreateProjectModal() {
             window.location.reload()
           }, 3000)
       })
-      .catch((error: Error) => {
+      .catch((error) => {
         console.log(error)
         toast({
             title: 'Cannot create project',
-            description: error.message,
+            description: error.response.data.message,
             status: 'error',
             duration: 5000,
             isClosable: true,

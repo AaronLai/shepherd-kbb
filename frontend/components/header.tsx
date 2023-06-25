@@ -31,19 +31,21 @@ export default function Header(){
                 </MenuButton>
                 <MenuList gap="2">
                     {/* <MenuItem _hover={{bgColor: "gray.200"}} borderBottom="1px" borderColor="gray.200" paddingY="3">Your Profile</MenuItem> */}
-                    <MenuItem _hover={{bgColor: "gray.200"}} paddingY="3">
                         {
-                            jwt == null? (
+                            jwt? (
                                 <Link href='/auth'>
-                                    Sign Up/Login
+                                    <MenuItem _hover={{bgColor: "gray.200"}} paddingY="3">
+                                            Sign Up/Login
+                                    </MenuItem>
                                 </Link>
                             ) : (
                                 <>
-                                <Text onClick={()=>logout()}>Logout</Text>
+                                <MenuItem _hover={{bgColor: "gray.200"}} paddingY="3" onClick={()=>logout()}>
+                                    <Text>Logout</Text>
+                                </MenuItem>
                                 </>
                             )
                         }
-                    </MenuItem>
                 </MenuList>
             </Menu>
         </Flex>

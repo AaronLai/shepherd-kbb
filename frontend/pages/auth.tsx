@@ -37,7 +37,7 @@ export default function Auth() {
       console.log(error)
       toast({
           title: 'Login failed',
-          description: error.message,
+          description: error.response.data.message,
           status: 'error',
           duration: 5000,
           isClosable: true,
@@ -62,7 +62,7 @@ export default function Auth() {
       console.error(error.response.data);
       toast({
           title: 'Sign up failed',
-          description: error.message,
+          description: error.response.data.message,
           status: 'error',
           duration: 5000,
           isClosable: true,

@@ -22,8 +22,8 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       res.status(200).json({ jwt });
     } catch (error : any) {
 
-
-      res.status(error.response.status).json({ error: error.message });
+      console.log(error.response.data.detail);
+      res.status(error.response.status).json({ message: error.response.data.detail });
     }
   } else {
     res.status(405).json({ error: 'Method not allowed' });
