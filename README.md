@@ -1,5 +1,7 @@
 # 852Shepherd
 
+![image info](https://852shepherd.vercel.app/_next/image?url=%2Fintro.png&w=640&q=75)
+
 "KnowledgeBot Builder" - Empowering You to Create Intelligent AI-Assistants without Code!
 
 KnowledgeBot Builder is a revolutionary no-code tool designed to simplify the process of building a comprehensive knowledge AI-assistant. With just a few clicks, users can effortlessly upload files, URLs of webpages, or even YouTube videos to create their very own personalized knowledge database.
